@@ -3,4 +3,4 @@ Project for a Programming subject of Computer Science at UFES (Universidade Fede
 
 Obs.: Code comments in portuguese for evaluation reasons.
 
-  This porject is an simulation of a medical appointment management system, where you have files with the doctors' agendas and files with clients characteristics. The program will read and change those files.
+  This project is an simulation of a medical appointment management system, where you have files with the doctors' agendas and files with clients characteristics. The program will read and change those files.
