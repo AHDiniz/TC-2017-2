@@ -1,0 +1,18 @@
+Joao Silva da Costa
+32178
+clinica geral
+2a 08 09 10
+5a 08 09 10
+6a 16 17
+
+Ana Carolina Maia
+44516
+gastro
+3a 13
+5a 08 09
+
+Marcelo Andrade
+84672
+gastro
+3a 13 14
+5a 08 09 10
