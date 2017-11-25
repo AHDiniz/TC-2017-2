@@ -20,6 +20,7 @@ Grupo: Alan Herculano Diniz e Rafael Belmock Pedruzzi
 #define DIM 30 // tamanho máximo de uma string
 #define H   10 // quantidade de intervalos de uma hora durante o dia (linhas da matriz de agenda de um médico)
 #define D    5 // dias úteis da semana (colunas da matriz de agenda de um médico)
+#define ML   5 // limite de médicos em um array/um mesmo arquivo
 
 // Definição das características relevantes de um médico:
 typedef struct agMedico
@@ -41,15 +42,17 @@ typedef struct cliente
 } cliente;
 
 // Funções provisórias:
-void ConstruirAgenda(int (*)[D]); // Função provisória que cria uma matriz randômica que representará uma agenda médica
 void ImprimirAgenda (int (*)[D]); // Função provisória que imprime cada elemento de uma agenda médica
 
 // Funções para inicializar structs:
 agMedico ConstruirMedico (char *, int, int, char *, int, int (*)[D]);    // Função que inicializa um médico
 cliente  ConstruirCliente(char *, int, int, long int, int, char *, int); // Função que inicializa um cliente
 
+// Funçõoes para ler dados específicos em arquivos texto:
+void ConstruirAgenda(int (*)[D], char *); // Função que cria uma matriz a paartir dos dados de uma agenda médica
+
 // Funções para ler arquivos de texto:
-void LerDadosMedicos(FILE *, agMedico *);
+void LerDadosMedicos(FILE *, agMedico *, int);
 
 int main(int argv, char *argc[])
 {
@@ -58,20 +61,14 @@ int main(int argv, char *argc[])
 	int agenda[H][D];
 	ConstruirAgenda(agenda);
 	agMedico medicos[] = {ConstruirMedico("Doutor", 6, 12345, "Doutoria", 8, agenda)};
-	LerDadosMedicos(dm, medicos);
+	LerDadosMedicos(dm, medicos, 1);
 	return 0;
 }
 
-void ConstruirAgenda(int agenda[][D])
+void ConstruirAgenda(int agenda[][D], char agChar[])
 {
 	int i, j;
-	srand(time(NULL));
-	for (i = 0; i < H; i++)
-		for (j = 0; j < D; j++)
-			if (i != 4)
-				agenda[i][j] = rand() % 2 - 1;
-			else
-				agenda[i][j] = -1;	
+		
 }
 
 void ImprimirAgenda(int agenda[][D])
@@ -112,9 +109,9 @@ cliente ConstruirCliente(char nome[], int nl, int id, long int fone, int idade, 
 	for (i = 0; i < nl; i++)
 		c.nome[i] = nome[i];
 	// Inicializando o id do cliente:
-	c.id = id;
+	c.id    = id;
 	// Inicializando o telefone do cliente:
-	c.fone = fone;
+	c.fone  = fone;
 	// Inicializando a idade do cliente:
 	c.idade = idade;
 	// Inicializando o médico desejado do cliente:
@@ -123,22 +120,48 @@ cliente ConstruirCliente(char nome[], int nl, int id, long int fone, int idade, 
 	return c;
 }
 
-void LerDadosMedicos(FILE *dados, agMedico medicos[])
+void LerDadosMedicos(FILE *dados, agMedico medicos[], int agl)
 {
-	int i, j, line = 0; // variáveis de incrementação
-	char arquivo[256];
-	dados = fopen("Conjunto0/dadosMedicos.txt", "r"); // inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido
+	int  i, j, k;           // variáveis de incrementação
+	int  linhas = 0;        // contador de linhas
+	int  carac  = 0;        // contador de caracteres
+	char arquivo[100][DIM]; // matriz que recebe os caracteres do arquivo de texto
+	// Variáveis que auxiliaram na construção dos médicos:
+	char nome[DIM], especialidade[DIM];
+	int  id,        agenda[H][D];
+	char lixo;
+	// Inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido:
+	dados = fopen("Conjunto0/dadosMedicos.txt", "r");
 	// Verificando se não há nenhum erro:
 	if (dados == NULL)
 	{
 		printf("Cannot open or find file");
 		return;
 	}
-	// 
+	// Inserindo todos os caracteres do arquivo num array e contando a quantidade de linhas e caracteres:
 	for (i = 0; !feof(dados); i++)
+		fgets(arquivo[i], DIM, dados); // inicializando as linhas da matriz
+	i = j = k = 0;
+	for (i = 0; i < strlen(arquivo[0]); i++)
+		medicos[0].nome[i] = arquivo[0][i];
+	medicos[0].nome[i] = "\0";
+	medicos[0].id = (int)strtol(arquivo[1], NULL, 10);
+	for (i = 0; i < strlen(arquivo[2]); i++)
+		medicos[0].especialidade[i] = arquivo[2][i];
+	medicos[0].especialidade[i] = "\0";
+	j = 3;
+	k += strlen(arquivo[0]) + strlen(arquivo[1]) + strlen(arquivo[2]);
+	char agenda[H][D];
+	int l;
+	for (i = 0, l = 0; arquivo[j][k] == arquivo[j + 1][0]; l++)
 	{
-		fscanf(dados, "%c", &arquivo[i]);
-		printf("%c", arquivo[i]);
+		agenda[i][l] = arquivo[j][k];
+		if (arquivo[j][k] == '\n')
+		{
+			j++;
+			i++;
+		}
+		k++;
 	}
 	fclose(dados); // fechando o arquivo
 }
