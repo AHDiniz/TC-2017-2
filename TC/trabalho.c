@@ -88,7 +88,7 @@ void ImprimirAgenda(int agenda[][D])
 agMedico ConstruirMedico(char nome[], int nl, int id, char especialidade[], int el, int agenda[][D])
 {
 	agMedico a; // variável que será retornada
-	int i, j;
+	int i, j;   // variáveis de incrementação
 	// Inicializando o nome do médico:
 	for (i = 0; i < nl; i++)
 		a.nome[i] = nome[i];
@@ -104,6 +104,25 @@ agMedico ConstruirMedico(char nome[], int nl, int id, char especialidade[], int 
 	return a;
 }
 
+cliente ConstruirCliente(char nome[], int nl, int id, long int fone, int idade, char medico[], int ml)
+{
+	cliente c; // variável que será retornada
+	int i;     // variável de incrementação
+	// Inicializando o nome do cliente:
+	for (i = 0; i < nl; i++)
+		c.nome[i] = nome[i];
+	// Inicializando o id do cliente:
+	c.id = id;
+	// Inicializando o telefone do cliente:
+	c.fone = fone;
+	// Inicializando a idade do cliente:
+	c.idade = idade;
+	// Inicializando o médico desejado do cliente:
+	for (i = 0; i < ml; i++)
+		c.medico[i] = medico[i];
+	return c;
+}
+
 void LerDadosMedicos(FILE *dados, agMedico medicos[])
 {
 	int i, j; // variáveis de incrementação
@@ -113,14 +132,6 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[])
 	{
 		printf("Cannot open or find file");
 		return;
-	}
-	for (i = 0; getchar() != '\n'; i++)
-	{
-		if (medicos != NULL)
-		{
-			
-		}
-		printf("\n");
 	}
 	fclose(dados);
 }
