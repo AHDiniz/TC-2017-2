@@ -1,0 +1,28 @@
+﻿Pedro Alvarez Cabral
+01500
+otorrino
+2a 08 15
+3a 09 15
+5a 15
+
+Alexandre Magno
+33623
+neuro
+4a 14 15
+5a 09 10 11
+
+Adolf Hitler
+60000
+urologista
+3a 13 14 15
+4a 14 15 16
+5a 15 16 17
+
+Donald Trump
+99999
+urologista
+2a 08 09 13
+3a 08 09 13
+4a 08 09 13
+5a 08 09 13
+6a 08 09 13
