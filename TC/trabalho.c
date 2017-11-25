@@ -9,7 +9,7 @@ Grupo: Alan Herculano Diniz e Rafael Belmock Pedruzzi
 	- Criar um arquivo de texto com as agendas médicas de cada semana;
 	- Verificar o médico com mais consultas;
 	- Verificar a especialidade com mais consultas;
-	- Verificar a faixa etária mais atendida;
+	- Verificar especialidade mais proocurada por faixa etária;
 */
 
 #include  <stdio.h>
@@ -57,9 +57,9 @@ int main(int argv, char *argc[])
 	FILE *dm;
 	int agenda[H][D];
 	ConstruirAgenda(agenda);
-	agMedico medicos[] = {ConstruirMedico("Doutor", 6, 123, "Doutoria", 8, agenda)};
+	agMedico medicos[] = {ConstruirMedico("Doutor", 6, 12345, "Doutoria", 8, agenda)};
 	LerDadosMedicos(dm, medicos);
-    return 0;
+	return 0;
 }
 
 void ConstruirAgenda(int agenda[][D])
@@ -125,13 +125,20 @@ cliente ConstruirCliente(char nome[], int nl, int id, long int fone, int idade, 
 
 void LerDadosMedicos(FILE *dados, agMedico medicos[])
 {
-	int i, j; // variáveis de incrementação
-	dados = fopen("dadosMedicos.txt", "r"); // inicializando o ponteiro do arquivo desejado
+	int i, j, line = 0; // variáveis de incrementação
+	char arquivo[256];
+	dados = fopen("Conjunto0/dadosMedicos.txt", "r"); // inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido
 	// Verificando se não há nenhum erro:
 	if (dados == NULL)
 	{
 		printf("Cannot open or find file");
 		return;
 	}
-	fclose(dados);
+	// 
+	for (i = 0; !feof(dados); i++)
+	{
+		fscanf(dados, "%c", &arquivo[i]);
+		printf("%c", arquivo[i]);
+	}
+	fclose(dados); // fechando o arquivo
 }
