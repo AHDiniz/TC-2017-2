@@ -55,10 +55,11 @@ void ConstruirAgenda(int (*)[D], char *); // Função que cria uma matriz a paar
 // Funções para ler arquivos de texto:
 void LerDadosMedicos(FILE *, agMedico *, int);
 
-// Funções que modificam informações de médicos ou clientes:
-void MarcarConsulta(agMedico, cliente); // Função que marca uma consulta entre médico e cliente
+// Funções que relacionam médicos e clientes:
+void RelacMedClientes(agMedico *, int, cliente *, int); // Função que compara um array de médicos com um array de clientes para que a marcação de consultas seja feita de forma correta
+void MarcarConsulta  (agMedico, cliente); // Função que marca uma consulta entre médico e cliente
 
-int main(int argv, char *argc[])
+int main(int *argv, char *argc[])
 {
 	// Por enquanto somente testes:
 	FILE *dm;
@@ -179,6 +180,16 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int agl)
 	fclose(dados); // fechando o arquivo
 }
 
+void RelacMedClientes(agMedico medicos[], int ml, cliente clientes[], int cl)
+{
+	int i, j; // variáveis de incrementação
+	// Para cada cliente no array de clientes:
+	for (i = 0; i < cl; i++)
+		for (j = 0; j < ml; j++) // Procurar no array de médicos um que seja o mesmo que o cliente deseja
+			if (strcmp(clientes[i].medico, medicos[j].nome))
+				MarcarConsulta(medicos[j], clientes[i]); // E então marcar uma consulta entre o médico e o cliente em questão
+}
+
 void MarcarConsulta(agMedico m, cliente c)
 {
 	int i, j;         // variáveis de incrementação
@@ -201,6 +212,6 @@ void MarcarConsulta(agMedico m, cliente c)
 	}
 	else
 	{
-		printf("Erro: o cliente nao quer consulta com esse medico.\n"); // Mensagem de erro se forem médicos diferentes
+		printf("Erro: o cliente %s nao quer consulta com esse medico %s.\n", c.nome, m.nome); // Mensagem de erro se forem médicos diferentes
 	}
 }
