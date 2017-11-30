@@ -4,12 +4,12 @@ Grupo: Alan Herculano Diniz e Rafael Belmock Pedruzzi
 ************************************************************************/
 
 /*Coisas a fazer:
-	- Ler um arquivo de texto com dados médicos e instanciar e inicializar médicos;
+	- Ler um arquivo de texto com dados médicos e instanciar e inicializar médicos; (praticamente pronto)
 	- Ler um .txt com dados de clientes e modificar as agendas médicas;
 	- Criar um arquivo de texto com as agendas médicas de cada semana;
-	- Verificar o médico com mais consultas;
+	- Verificar o médico com mais consultas; (pronto)
 	- Verificar a especialidade com mais consultas;
-	- Verificar especialidade mais proocurada por faixa etária;
+	- Verificar especialidade mais procurada por faixa etária; (0 a 25, 26 a 50, 51 a 75 e 76 a 100)
 */
 
 #include  <stdio.h>
@@ -41,6 +41,13 @@ typedef struct cliente
     char     medico[DIM]; // o médico pelo qual o cliente deseja ser atendido
 } cliente;
 
+// Structs auxiliares:
+typedef struct conslPorEspec
+{
+    char especialidade[DIM]; // a especialidade médica em questão
+    int  numConsultas;       // número de consutas marcadas para a dita especialidade
+} conslPorEspec;
+
 // Funções provisórias:
 void ImprimirAgenda (int (*)[D]); // Função provisória que imprime cada elemento de uma agenda médica
 void AgendaRandom   (int (*)[D]); // Função que constrói uma agenda com elementos randômicos
@@ -59,14 +66,22 @@ void LerDadosMedicos(FILE *, agMedico *, int);
 void RelacMedClientes(agMedico *, int, cliente *, int); // Função que compara um array de médicos com um array de clientes para que a marcação de consultas seja feita de forma correta
 void MarcarConsulta  (agMedico, cliente); // Função que marca uma consulta entre médico e cliente
 
+// Funções relacinadas com os relatórios:
+agMedico MedicoMaisOcupado (agMedico *, int);                 // Função que verifica o médico com a maior quantidade de consultas na sua agenda
+char * EspecMaisRequisitada(agMedico *, int);                 // Função que verifica a especialidade com a maior quantidade de consultas marcadas
+char * EspecPorFaixaEtaria (agMedico *, int, cliente *, int); // Função que verifica a especialidade mais procurada para cada faixa etária
+
 int main(int *argv, char *argc[])
 {
 	// Por enquanto somente testes:
 	FILE *dm;
 	int agenda[H][D];
 	AgendaRandom(agenda);
+    agenda[0][0] = 2;
+    agenda[1][2] = 3;
 	agMedico medicos[] = {ConstruirMedico("Doutor", 6, 12345, "Doutoria", 8, agenda)};
-	LerDadosMedicos(dm, medicos, 1);
+    cliente clientes[] = {ConstruirCliente("Cliente", 7, 123, 11111111, 30, "Doutor", 6)};
+    printf("%s\n", MedicoMaisOcupado(medicos, 1).nome);
 	return 0;
 }
 
@@ -77,12 +92,14 @@ void AgendaRandom(int agenda[][D])
 	for (i = 0; i < H; i++)
 		for (j = 0; j < D; j++)
 			agenda[i][j] = rand() % 2 - 1;
+    for (i = 0; i < D; i++)
+        agenda[4][i] = -1;
 }
 
 void ConstruirAgenda(int agenda[][D], char agChar[])
 {
 	int i, j;
-		
+
 }
 
 void ImprimirAgenda(int agenda[][D])
@@ -136,7 +153,7 @@ cliente ConstruirCliente(char nome[], int nl, int id, long int fone, int idade, 
 
 void LerDadosMedicos(FILE *dados, agMedico medicos[], int agl)
 {
-	int  i, j, k;           // variáveis de incrementação
+	/*int  i, j, k;           // variáveis de incrementação
 	int  linhas = 0;        // contador de linhas
 	int  carac  = 0;        // contador de caracteres
 	char arquivo[100][DIM]; // matriz que recebe os caracteres do arquivo de texto
@@ -177,7 +194,7 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int agl)
 		}
 		k++;
 	}
-	fclose(dados); // fechando o arquivo
+	fclose(dados); // fechando o arquivo*/
 }
 
 void RelacMedClientes(agMedico medicos[], int ml, cliente clientes[], int cl)
@@ -214,4 +231,30 @@ void MarcarConsulta(agMedico m, cliente c)
 	{
 		printf("Erro: o cliente %s nao quer consulta com esse medico %s.\n", c.nome, m.nome); // Mensagem de erro se forem médicos diferentes
 	}
+}
+
+agMedico MedicoMaisOcupado(agMedico medicos[], int ml)
+{
+    int i, j, k;       // variáveis de incrementação
+    int consultas = 0; // quantidade de consultas do médico da iteração atual do loop
+    int consulAnt = 0; // quantidade de consultas do médico da iteração anterior
+    int desejado  = 0; // médico com a maior quantidade de consultas marcadas
+
+    // Procurando o médico com a maior quantidade de consultas:
+    for (i = 0; i < ml; i++) // Varrendo o array de médicos
+    {
+        for (j = 0; j < H; j++) // Varrendo as linhas da agenda
+            for (k = 0; k < D; k++) // Varrendo cada item da linha da iteração atual
+            {
+                int a = medicos[i].agenda[j][k];
+                if (a != 0 && a != -1) // Se a posição verificada atualmente não for um horário vago/indisponível
+                    consultas++;
+            }
+        // Atualizando os valores do médico desejado e das consultas anterior e atual
+        consulAnt = consultas;
+        consultas = 0;
+        if (consultas >= consulAnt)
+            desejado = i;
+    }
+    return medicos[desejado]; // retornando o médico mais procurado
 }
