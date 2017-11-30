@@ -43,14 +43,14 @@ typedef struct cliente
 
 // Funções provisórias:
 void ImprimirAgenda (int (*)[D]); // Função provisória que imprime cada elemento de uma agenda médica
-//void AgendaRandom   (int (*)[D]); // Função que constrói uma agenda com elementos randômicos
+void ConstroiAgenda   (int (*)[D]); // Função que constrói a agenda generica do medico
 
 // Funções para inicializar structs:
 //agMedico ConstruirMedico (char *, int, int, char *, int, int (*)[D]);    // Função que inicializa um médico
 //cliente  ConstruirCliente(char *, int, int, long int, int, char *, int); // Função que inicializa um cliente
 
 // Funçõoes para ler dados específicos em arquivos texto:
-//void ConstruirAgenda(int (*)[D], char *); // Função que cria uma matriz a paartir dos dados de uma agenda médica
+void ConstruirAgenda(int agenda[][D], int dia,int horarios[], int tam); // Função que acressenta a matriz agenda dados dos horarios
 
 // Funções para ler arquivos de texto:
 void LerDadosMedicos(FILE *, agMedico *, int);
@@ -69,22 +69,25 @@ int main(int argv, char *argc[])
 	LerDadosMedicos(dm, medicos, 1);
 	return 0;
 }
-/*
-void AgendaRandom(int agenda[][D])
+
+void ConstroiAgenda(int agenda[][D])
 {
-	srand(time(NULL));
 	int i, j;
 	for (i = 0; i < H; i++)
 		for (j = 0; j < D; j++)
-			agenda[i][j] = rand() % 2 - 1;
+				agenda[i][j] = 0;
+
+	for(i = 0 ; i < D ; i++)
+		agenda[4][i] = -1;
 }
 
-void ConstruirAgenda(int agenda[][D], char agChar[])
+void ConstruirAgenda(int agenda[][D], int dia,int horarios[], int tam)
 {
 	int i, j;
-		
+	for(i = 0 ; i < tam ; i++)
+		agenda[horarios[i]-8][dia-2] = -1;
 }
-*/
+
 void ImprimirAgenda(int agenda[][D])
 {
 	int i, j;
@@ -136,25 +139,64 @@ cliente ConstruirCliente(char nome[], int nl, int id, long int fone, int idade, 
 */
 void LerDadosMedicos(FILE *dados, agMedico medicos[], int agl)
 {
-	int  i, j, k, l, m;           // variáveis de incrementação
-	int  linhas = 0;        // contador de linhas
-	int  carac  = 0;        // contador de caracteres
+	int  i, j, k, l, m, dia;           // variáveis de incrementação
 	char arquivo[100][DIM]; // matriz que recebe os caracteres do arquivo de texto
+
 	// Variáveis que auxiliaram na construção dos médicos:
 	char nome[DIM], especialidade[DIM];
 	int  id;
-	char indisponivel[H][D][DIM];
+	char indisponivel[DIM];
+	int horario[DIM];
+
 	// Inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido:
 	dados = fopen("Conjunto0/dadosMedicos.txt", "r");
+
 	// Verificando se não há nenhum erro:
 	if (dados == NULL)
 	{
 		printf("Cannot open or find file");
-		return;
+		exit(1);
 	}
+
+	// Extraindo informacoes dos medicos:
+	// Nome, id e especialidade:
+	fscanf(dados, "%[^\n]\n%d\n%[^\n]\n", medicos[0].nome, &medicos[0].id, medicos[0].especialidade);
+
+	fscanf(dados, "%d %[^\n]", &dia, indisponivel);
+
+	// Transferindo os numeros para um vetor int:
+	for(i = 2, j = 0, m = 0 ; i < strlen(indisponivel) ; i++)
+		if(indisponivel[i] == '1' || indisponivel[i] == '2' || indisponivel[i] == '3' || indisponivel[i] == '4' || indisponivel[i] == '5' || indisponivel[i] == '6' || indisponivel[i] == '7' || indisponivel[i] == '8' || indisponivel[i] == '9' || indisponivel[i] == '0'){
+			horario[j] = indisponivel[i]-48;
+			j++;
+			m++;
+		}
+
+	// Obtendo as posicoes para a matriz agenda:
+	for(i = 0, j = 0 ; i < m ; i += 2, j++){
+		k = horario[i]*10 + horario[i+1];
+		horario[j] = k;
+	}
+
+	
+
+
+	printf("%s\n%d\n%s\n%d %s\n", medicos[0].nome, medicos[0].id, medicos[0].especialidade, dia, indisponivel);
+
+	for(i = 0 ;i < j ; i++)
+		printf("%d ", horario[i]);
+	printf("\n");
+
+	ConstroiAgenda(medicos[0].agenda);
+	ConstruirAgenda(medicos[0].agenda, dia, horario, j);
+	ImprimirAgenda(medicos[0].agenda);
+
+
+
+/*
 	// Inserindo todos os caracteres do arquivo num array e contando a quantidade de linhas e caracteres:
-	for (k = 0; !feof(dados); k++)
-		fgets(arquivo[k], DIM, dados); // inicializando as linhas da matriz
+	for (i = 0; !feof(dados); i++)
+		fgets(arquivo[i], DIM, dados); // inicializando as linhas da matriz
 
 	fclose(dados); // fechando o arquivo
 
@@ -201,7 +243,7 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int agl)
 	printf("%s\n%d\n%s\n%s", medicos[1].nome, medicos[1].id, medicos[1].especialidade, indisponivel[1][0]);
 	printf("%s\n%d\n%s\n%s", medicos[2].nome, medicos[2].id, medicos[2].especialidade, indisponivel[2][0]);
 	printf("%s\n%d\n%s\n%s", medicos[3].nome, medicos[3].id, medicos[3].especialidade, indisponivel[3][0]);
-
+*/
 }
 
 void MarcarConsulta(agMedico m, cliente c)
