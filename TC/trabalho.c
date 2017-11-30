@@ -136,14 +136,14 @@ cliente ConstruirCliente(char nome[], int nl, int id, long int fone, int idade, 
 */
 void LerDadosMedicos(FILE *dados, agMedico medicos[], int agl)
 {
-	int  i, j, k, l;           // variáveis de incrementação
+	int  i, j, k, l, m;           // variáveis de incrementação
 	int  linhas = 0;        // contador de linhas
 	int  carac  = 0;        // contador de caracteres
 	char arquivo[100][DIM]; // matriz que recebe os caracteres do arquivo de texto
 	// Variáveis que auxiliaram na construção dos médicos:
 	char nome[DIM], especialidade[DIM];
 	int  id;
-	char agenda[H][D];
+	char indisponivel[H][D][DIM];
 	// Inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido:
 	dados = fopen("Conjunto0/dadosMedicos.txt", "r");
 	// Verificando se não há nenhum erro:
@@ -153,48 +153,55 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int agl)
 		return;
 	}
 	// Inserindo todos os caracteres do arquivo num array e contando a quantidade de linhas e caracteres:
-	for (i = 0; !feof(dados); i++)
-		fgets(arquivo[i], DIM, dados); // inicializando as linhas da matriz
-
-	i = j = k = 0;
-	printf("%ld\n", strlen(arquivo[0]) );
-	printf("%ld\n", strlen(arquivo[1]) );
-	printf("%ld\n", strlen(arquivo[2]) );
-
-	// Extraindo informacoes do medico:
-	// Nome:
-	for (i = 0; i < strlen(arquivo[0]); i++)
-		medicos[0].nome[i] = arquivo[0][i];
-
-	// Id:
-	medicos[0].id = (int)strtol(arquivo[1], NULL, 10);
-
-	// Especialidade:
-	for (i = 0; i < strlen(arquivo[2]); i++)
-		medicos[0].especialidade[i] = arquivo[2][i];
-
-	medicos[0].especialidade[i] = '\0';
-
-	printf("%ld\n", strlen(medicos[0].especialidade) );
-	printf("%s\n", medicos[0].especialidade );
-
-	//k += strlen(arquivo[0]) + strlen(arquivo[1]) + strlen(arquivo[2]);
-/*
-	for (i = 0, l = 0, j = 3; arquivo[j][l] != '\n' || arquivo[j + 1][0] != '\n'; l++)
-	{
-		agenda[i][l] = arquivo[j][l];
-		if (arquivo[j][l] == '\n')
-		{
-			j++;
-			i++;
-		}
-	}
-*/
-	//printf("%ld\n", strlen(agenda[1]) );
+	for (k = 0; !feof(dados); k++)
+		fgets(arquivo[k], DIM, dados); // inicializando as linhas da matriz
 
 	fclose(dados); // fechando o arquivo
 
-	//printf("%s\n%d\n%s\n%s", medicos[0].nome, medicos[0].id, medicos[0].especialidade, agenda[0]);
+	// Extraindo informacoes dos medicos:
+	j = m = 0;
+	do{
+		// Nome:
+		for (i = 0; i < strlen(arquivo[0]); i++)
+			medicos[m].nome[i] = arquivo[0][i];
+
+		medicos[m].nome[i-2] = '\0';
+		j++;
+
+		// Id:
+		medicos[m].id = (int)strtol(arquivo[1], NULL, 10);
+		j++;
+
+		// Especialidade:
+		for (i = 0; i < strlen(arquivo[2]); i++)
+			medicos[m].especialidade[i] = arquivo[2][i];
+
+		medicos[m].especialidade[i-2] = '\0';
+		j++;
+
+		// Horarios indisponiveis:
+		for (i = 0, l = 0; arquivo[j][1] != '\n'; l++)
+		{
+		
+			if (arquivo[j][l] == '\n')
+			{
+				indisponivel[m][i][l-1] = '\0';
+				j++;
+				i++;
+				l = -1;
+			}
+			else
+				indisponivel[m][i][l] = arquivo[j][l];
+		}
+		j++;
+		m++;
+	}while(j != k);
+
+	printf("%s\n%d\n%s\n%s", medicos[0].nome, medicos[0].id, medicos[0].especialidade, indisponivel[0][0]);
+	printf("%s\n%d\n%s\n%s", medicos[1].nome, medicos[1].id, medicos[1].especialidade, indisponivel[1][0]);
+	printf("%s\n%d\n%s\n%s", medicos[2].nome, medicos[2].id, medicos[2].especialidade, indisponivel[2][0]);
+	printf("%s\n%d\n%s\n%s", medicos[3].nome, medicos[3].id, medicos[3].especialidade, indisponivel[3][0]);
+
 }
 
 void MarcarConsulta(agMedico m, cliente c)
