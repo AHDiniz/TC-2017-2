@@ -21,6 +21,7 @@ Grupo: Alan Herculano Diniz e Rafael Belmock Pedruzzi
 #define H   10 // quantidade de intervalos de uma hora durante o dia (linhas da matriz de agenda de um médico)
 #define D    5 // dias úteis da semana (colunas da matriz de agenda de um médico)
 #define ML   10 // limite de médicos em um array/um mesmo arquivo
+#define CL   45 // limite de pacientes em um array/um mesmo arquivo
 
 // Definição das características relevantes de um médico:
 typedef struct agMedico
@@ -45,33 +46,40 @@ typedef struct cliente
 void ImprimirAgenda (int (*)[D]); // Função provisória que imprime cada elemento de uma agenda médica
 void ConstroiAgenda   (int (*)[D]); // Função que constrói a agenda generica do medico
 
-// Funções para inicializar structs:
-//agMedico ConstruirMedico (char *, int, int, char *, int, int (*)[D]);    // Função que inicializa um médico
-//cliente  ConstruirCliente(char *, int, int, long int, int, char *, int); // Função que inicializa um cliente
-
 // Funçõoes para ler dados específicos em arquivos texto:
-void ConstruirAgenda(int agenda[][D], int dia,int horarios[], int tam); // Função que acressenta a matriz agenda dados dos horarios
+void ConstruirAgenda(int (*)[D], int ,int *, int); // Função que acressenta a matriz agenda dados dos horarios
 
 // Funções para ler arquivos de texto:
-void LerDadosMedicos(FILE *, agMedico *, int *nMedicos, int conjunto);
+void LerDadosMedicos(FILE *, agMedico *, int *, int);
+void LerDadosClientes(FILE *, int, cliente *, int *, int);
 
 // Funções que modificam informações de médicos ou clientes:
 //void MarcarConsulta(agMedico, cliente); // Função que marca uma consulta entre médico e cliente
 
+
 int main(int argv, char *argc[])
 {
 	// Por enquanto somente testes:
-	FILE *dm;
-	int conjunto;	// conjunto de exemplos a ser avaliado
-	int nMedicos;	// numero total de medicos
-	agMedico medicos[ML];
+	FILE *dm, *lp1, *lp2, *lp3, *lp4;
+	int conjunto;	                    // conjunto de exemplos a ser avaliado
+	int nMed, nCl1, nCl2, nCl3, nCl4;   // numero total de medicos e clientes
+	agMedico medicos[ML];               // vetor de medicos
+	cliente clientes1[CL];              // vetor de clientes da semana 1
+	cliente clientes2[CL];              // vetor de clientes da semana 2
+	cliente clientes3[CL];              // vetor de clientes da semana 3
+	cliente clientes4[CL];              // vetor de clientes da semana 4
 
 	printf("Informe o numero do conjunto a ser avaliado (0 - 5): ");
 	scanf("%d", &conjunto);
 
-	LerDadosMedicos(dm, medicos, &nMedicos, conjunto);
+	LerDadosMedicos(dm, medicos, &nMed, conjunto);
+	LerDadosClientes(lp1, 1, clientes1, &nCl1, conjunto);
+	LerDadosClientes(lp2, 2, clientes2, &nCl2, conjunto);
+	LerDadosClientes(lp3, 3, clientes3, &nCl3, conjunto);
+	LerDadosClientes(lp4, 4, clientes4, &nCl4, conjunto);
 	return 0;
 }
+
 
 void ConstroiAgenda(int agenda[][D])
 {
@@ -101,53 +109,14 @@ void ImprimirAgenda(int agenda[][D])
 		printf("\n");
 	}
 }
-/*
-agMedico ConstruirMedico(char nome[], int nl, int id, char especialidade[], int el, int agenda[][D])
-{
-	agMedico a; // variável que será retornada
-	int i, j;   // variáveis de incrementação
-	// Inicializando o nome do médico:
-	for (i = 0; i < nl; i++)
-		a.nome[i] = nome[i];
-	// Inicializando o id do médico:
-	a.id = id;
-	// Inicializando a especialidade do médico:
-	for (i = 0; i < el; i++)
-		a.especialidade[i] = especialidade[i];
-	// Inicializando a agenda do médico:
-	for (i = 0; i < H; i++)
-		for (j = 0; j < D; j++)
-			a.agenda[i][j] = agenda[i][j];
-	return a;
-}
 
-cliente ConstruirCliente(char nome[], int nl, int id, long int fone, int idade, char medico[], int ml)
-{
-	cliente c; // variável que será retornada
-	int i;     // variável de incrementação
-	// Inicializando o nome do cliente:
-	for (i = 0; i < nl; i++)
-		c.nome[i] = nome[i];
-	// Inicializando o id do cliente:
-	c.id    = id;
-	// Inicializando o telefone do cliente:
-	c.fone  = fone;
-	// Inicializando a idade do cliente:
-	c.idade = idade;
-	// Inicializando o médico desejado do cliente:
-	for (i = 0; i < ml; i++)
-		c.medico[i] = medico[i];
-	return c;
-}
-*/
-void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMedicos, int conjunto)
+void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 {
 	int  i, j, k;           // variáveis de incrementação
 	int nMedc;				// numero total de medicos
 
 	// Variáveis que auxiliaram na construção dos médicos:
-	char nome[DIM], especialidade[DIM];
-	int  id, tam, dia;
+	int  tam, dia;
 	char indisponivel[DIM];
 	int horario[DIM];
 
@@ -169,10 +138,10 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMedicos, int conjunt
 				exit(0);
 	}
 
-	// Verificando se não há nenhum erro:
+	// Verificando se não há erro:
 	if (dados == NULL)
 	{
-		printf("Cannot open or find file");
+		printf("Incapaz de abrir ou encontrar arquivo");
 		exit(1);
 	}
 
@@ -215,7 +184,9 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMedicos, int conjunt
 
 	}while(!feof(dados));
 
-	*nMedicos = nMedc;
+	*nMed = nMedc;
+
+	fclose(dados); // fechando o arquivo
 
 	// Impressao para teste
 	for(i = 0 ; i < nMedc ; i++)
@@ -225,63 +196,124 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMedicos, int conjunt
 	ImprimirAgenda(medicos[i].agenda);
 	}
 
+}
 
+void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int conjunto){
 
+	int  i, j, k;           // variáveis de incrementação
+	int nClien;				// numero total de clientes
 
+	// Variáveis que auxiliaram na construção dos clientes:
+	int anoNasc;
+	char nascimento[DIM];
+	int ano[4];
 
-/*
-	// Inserindo todos os caracteres do arquivo num array e contando a quantidade de linhas e caracteres:
-	for (i = 0; !feof(dados); i++)
-		fgets(arquivo[i], DIM, dados); // inicializando as linhas da matriz
+	// Inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido:
+	switch(conjunto){
+		case 0 : switch(semana){
+					case 1 : dados = fopen("Conjunto0/listaPacientes-Semana1.txt", "r");
+							break;
+					case 2 : dados = fopen("Conjunto0/listaPacientes-Semana2.txt", "r");
+							break;
+					case 3 : dados = fopen("Conjunto0/listaPacientes-Semana3.txt", "r");
+							break;
+					case 4 : dados = fopen("Conjunto0/listaPacientes-Semana4.txt", "r");
+							break;
+				}
+				break;
+		case 1 : switch(semana){
+					case 1 : dados = fopen("Conjunto1/listaPacientes-Semana1.txt", "r");
+							break;
+					case 2 : dados = fopen("Conjunto1/listaPacientes-Semana2.txt", "r");
+							break;
+					case 3 : dados = fopen("Conjunto1/listaPacientes-Semana3.txt", "r");
+							break;
+					case 4 : dados = fopen("Conjunto1/listaPacientes-Semana4.txt", "r");
+							break;
+				}
+				break;
+		case 2 : switch(semana){
+					case 1 : dados = fopen("Conjunto2/listaPacientes-Semana1.txt", "r");
+							break;
+					case 2 : dados = fopen("Conjunto2/listaPacientes-Semana2.txt", "r");
+							break;
+					case 3 : dados = fopen("Conjunto2/listaPacientes-Semana3.txt", "r");
+							break;
+					case 4 : dados = fopen("Conjunto2/listaPacientes-Semana4.txt", "r");
+							break;
+				}
+				break;
+		case 3 : switch(semana){
+					case 1 : dados = fopen("Conjunto3/listaPacientes-Semana1.txt", "r");
+							break;
+					case 2 : dados = fopen("Conjunto3/listaPacientes-Semana2.txt", "r");
+							break;
+					case 3 : dados = fopen("Conjunto3/listaPacientes-Semana3.txt", "r");
+							break;
+					case 4 : dados = fopen("Conjunto3/listaPacientes-Semana4.txt", "r");
+							break;
+				}
+				break;
+		case 4 : switch(semana){
+					case 1 : dados = fopen("Conjunto4/listaPacientes-Semana1.txt", "r");
+							break;
+					case 2 : dados = fopen("Conjunto4/listaPacientes-Semana2.txt", "r");
+							break;
+					case 3 : dados = fopen("Conjunto4/listaPacientes-Semana3.txt", "r");
+							break;
+					case 4 : dados = fopen("Conjunto4/listaPacientes-Semana4.txt", "r");
+							break;
+				}
+				break;
+		case 5 : switch(semana){
+					case 1 : dados = fopen("Conjunto5/listaPacientes-Semana1.txt", "r");
+							break;
+					case 2 : dados = fopen("Conjunto5/listaPacientes-Semana2.txt", "r");
+							break;
+					case 3 : dados = fopen("Conjunto5/listaPacientes-Semana3.txt", "r");
+							break;
+					case 4 : dados = fopen("Conjunto5/listaPacientes-Semana4.txt", "r");
+							break;
+				}
+				break;
+		default: printf("Conjunto nao existe!                                                                                                           ...idiota\n");
+				exit(0);
+	}
+
+	// Verificando se não há erro:
+	if (dados == NULL)
+	{
+		printf("Incapaz de abrir ou encontrar arquivo");
+		exit(1);
+	}
+
+	// Extraindo informacoes dos clientes:
+	nClien = 0;
+	do{
+		fscanf(dados, "%[^\n]\n%d\n%ld\n%[^\n]\n%[^\n]\n", clientes[nClien].nome, &clientes[nClien].id, &clientes[nClien].fone, nascimento, clientes[nClien].medico);
+
+		for(i = 6 ; i < 10 ; i++)
+			ano[i-6] = nascimento[i]-48;
+
+		anoNasc = ano[0]*1000 + ano[1]*100 + ano[2]*10 + ano[3];
+		clientes[nClien].idade = 2017 - anoNasc;
+
+		nClien++; // Atualizando o numero de clientes
+
+	}while(!feof(dados));
+
+	*nCl = nClien;
 
 	fclose(dados); // fechando o arquivo
 
-	// Extraindo informacoes dos medicos:
-	j = m = 0;
-	do{
-		// Nome:
-		for (i = 0; i < strlen(arquivo[0]); i++)
-			medicos[m].nome[i] = arquivo[0][i];
+	// Impressao para teste
+	for(i = 0 ; i < nClien ; i++)
+		printf("%s\n%d\n%ld\n%d\n%s\n%d\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico, nClien);
 
-		medicos[m].nome[i-2] = '\0';
-		j++;
 
-		// Id:
-		medicos[m].id = (int)strtol(arquivo[1], NULL, 10);
-		j++;
-
-		// Especialidade:
-		for (i = 0; i < strlen(arquivo[2]); i++)
-			medicos[m].especialidade[i] = arquivo[2][i];
-
-		medicos[m].especialidade[i-2] = '\0';
-		j++;
-
-		// Horarios indisponiveis:
-		for (i = 0, l = 0; arquivo[j][1] != '\n'; l++)
-		{
-		
-			if (arquivo[j][l] == '\n')
-			{
-				indisponivel[m][i][l-1] = '\0';
-				j++;
-				i++;
-				l = -1;
-			}
-			else
-				indisponivel[m][i][l] = arquivo[j][l];
-		}
-		j++;
-		m++;
-	}while(j != k);
-
-	printf("%s\n%d\n%s\n%s", medicos[0].nome, medicos[0].id, medicos[0].especialidade, indisponivel[0][0]);
-	printf("%s\n%d\n%s\n%s", medicos[1].nome, medicos[1].id, medicos[1].especialidade, indisponivel[1][0]);
-	printf("%s\n%d\n%s\n%s", medicos[2].nome, medicos[2].id, medicos[2].especialidade, indisponivel[2][0]);
-	printf("%s\n%d\n%s\n%s", medicos[3].nome, medicos[3].id, medicos[3].especialidade, indisponivel[3][0]);
-*/
 }
 
+/*
 void MarcarConsulta(agMedico m, cliente c)
 {
 	int i, j;         // variáveis de incrementação
@@ -306,4 +338,4 @@ void MarcarConsulta(agMedico m, cliente c)
 	{
 		printf("Erro: o cliente nao quer consulta com esse medico.\n"); // Mensagem de erro se forem médicos diferentes
 	}
-}
+}*/
