@@ -10,6 +10,7 @@ Grupo: Alan Herculano Diniz e Rafael Belmock Pedruzzi
 	- Verificar o médico com mais consultas;
 	- Verificar a especialidade com mais consultas;
 	- Verificar especialidade mais proocurada por faixa etária;
+	- Remover essa lista antes de enviar;
 */
 
 #include  <stdio.h>
@@ -44,14 +45,17 @@ typedef struct cliente
 
 // Funções provisórias:
 void ImprimirAgenda (int (*)[D]); // Função provisória que imprime cada elemento de uma agenda médica
-void ConstroiAgenda   (int (*)[D]); // Função que constrói a agenda generica do medico
 
-// Funçõoes para ler dados específicos em arquivos texto:
-void ConstruirAgenda(int (*)[D], int ,int *, int); // Função que acressenta a matriz agenda dados dos horarios
+// Funcoes para construcao da agenda do medico:
+void ConstroiAgenda   (int (*)[D]);                  // função que constrói a agenda generica do medico
+void ConstruirAgenda(int (*)[D], int ,int *, int);   // função que acressenta os horarios indisponiveis na agenda do medico
 
 // Funções para ler arquivos de texto:
 void LerDadosMedicos(FILE *, agMedico *, int *, int);
 void LerDadosClientes(FILE *, int, cliente *, int *, int);
+
+// Funcoes auxiliares de LerDadosMedicos:
+int SomenteInts(int *, char *);   // transfere os numeros de um vetor char para um vetor int e retorna seu tamanho
 
 // Funções que modificam informações de médicos ou clientes:
 //void MarcarConsulta(agMedico, cliente); // Função que marca uma consulta entre médico e cliente
@@ -60,6 +64,7 @@ void LerDadosClientes(FILE *, int, cliente *, int *, int);
 int main(int argv, char *argc[])
 {
 	// Por enquanto somente testes:
+	// Alan, nao remova meus comentarios zuados, eles dao vida pro projeto! (e nao eh como se fossem frazes aleatorias jogadas entre parenteses)
 	FILE *dm, *lp1, *lp2, *lp3, *lp4;
 	int conjunto;	                    // conjunto de exemplos a ser avaliado
 	int nMed, nCl1, nCl2, nCl3, nCl4;   // numero total de medicos e clientes
@@ -112,13 +117,14 @@ void ImprimirAgenda(int agenda[][D])
 
 void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 {
-	int  i, j, k;           // variáveis de incrementação
-	int nMedc;				// numero total de medicos
+	int  i, j, k;   // variáveis de incrementação
+	int nMedc;	// numero total de medicos
 
-	// Variáveis que auxiliaram na construção dos médicos:
-	int  tam, dia;
-	char indisponivel[DIM];
-	int horario[DIM];
+	// Variáveis auxiliares para construção dos médicos:
+	int dia;		  // armazena o dia(da semana) com horarios indisponiveis, atualizada numa recursao
+	char indisponivel[DIM];   // armazena a string dos horarios indisponiveis (relativos ao dia)
+	int horario[DIM];	  // armazena os horarios indisponiveis ("filtra o vetor indisponiveis")
+	int tam;		  // armazena o tamanho do vetor horario
 
 	// Inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido:
 	switch(conjunto){
@@ -146,49 +152,42 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 	}
 
 	// Extraindo informacoes dos medicos:
-	nMedc = 0;
+	nMedc = 0;   // contador do numero de medicos (sera transferido para nMed)
 	do{
-		ConstroiAgenda(medicos[nMedc].agenda); // Inicializando a matriz agenda generica
+		ConstroiAgenda(medicos[nMedc].agenda); // Inicializando a matriz agenda (vazia)
 
 		// Nome, id e especialidade:
 		fscanf(dados, "%[^\n]\n%d\n%[^\n]\n", medicos[nMedc].nome, &medicos[nMedc].id, medicos[nMedc].especialidade);
 
 		// Extraindo os horarios indisponiveis:
-		fscanf(dados, "%d %[^\n]", &dia, indisponivel);
+		// Preparando a recursao
+		dia = 0;  // inicializa a variavel dia, so se altera caso a proxima linha escaneada comece com um numero, consegue advinhar qual?(dica: eh nome de uma variavel)
+		fscanf(dados, "%d %[^\n]", &dia, indisponivel);   /* extrai os primeiros horarios indisponiveis e seus respectivos dias.
+								     caso nao tenha, 'dia' se mantem igual a 0
+								  */
 
 		while(dia != 0){
-			// Selecionando os numeros e transferindo-os para um vetor int:
-			for(i = 2, j = 0, tam = 0 ; i < strlen(indisponivel) ; i++)
-				if(indisponivel[i] == '1' || indisponivel[i] == '2' || indisponivel[i] == '3' || indisponivel[i] == '4' || indisponivel[i] == '5' || indisponivel[i] == '6' || indisponivel[i] == '7' || indisponivel[i] == '8' || indisponivel[i] == '9' || indisponivel[i] == '0')
-				{
-					horario[j] = indisponivel[i]-48;
-					j++;
-					tam++;
-				}
-
-			// Obtendo os horarios para a matriz agenda: (agrupando os algarismos de dois em dois)
-			for(i = 0, j = 0 ; i < tam ; i += 2, j++){
-				k = horario[i]*10 + horario[i+1];
-				horario[j] = k;
-			}
+			// Selecionando somente os numeros e transferindo-os para o vetor horario: (cortando espacos e aquele 'a')
+			tam = SomenteInts(horario, indisponivel);   // funcao retorna o tamanho do vetor 'horario' (sim, ja sei, uma gambiarra formidavel!)
 
 			// Incluindo os horarios indisponiveis na agenda:
-			ConstruirAgenda(medicos[nMedc].agenda, dia, horario, j);
+			ConstruirAgenda(medicos[nMedc].agenda, dia, horario, tam);
 
-			// Reinicializando as condicoes da recursao:
+			// Reinicializando as condicoes da recursao para extrair os proximos horarios:
 			dia = 0;
-			fscanf(dados, "%d %[^\n]", &dia, indisponivel);
+			fscanf(dados, "%d %[^\n]", &dia, indisponivel); // extraindo proximo horario, caso seja a quebra de linha, 'dia' se mantem igual a 0
 		}
 
 		nMedc++; // Atualizando o numero de medicos
 
-	}while(!feof(dados));
+	}while(!feof(dados));   // a recursao continua até o fim do arquivo, retirando todos os dados de um unico medico a cada repeticao
 
-	*nMed = nMedc;
-
+	*nMed = nMedc;   // eu avisei
 	fclose(dados); // fechando o arquivo
 
-	// Impressao para teste
+
+
+	// Impressao para teste (SOMENTE TESTE)
 	for(i = 0 ; i < nMedc ; i++)
 	{
 	printf("%s\n%d\n%s\n", medicos[i].nome, medicos[i].id, medicos[i].especialidade);
@@ -307,10 +306,30 @@ void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int
 	fclose(dados); // fechando o arquivo
 
 	// Impressao para teste
-	for(i = 0 ; i < nClien ; i++)
-		printf("%s\n%d\n%ld\n%d\n%s\n%d\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico, nClien);
+	//for(i = 0 ; i < nClien ; i++)
+	//	printf("%s\n%d\n%ld\n%d\n%s\n%d\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico, nClien);
 
 
+}
+
+int SomenteInts(int horario[], char indisponivel[]){
+
+	int i, j, k, tam;
+
+	for(i = 2, j = 0 ; i < strlen(indisponivel) ; i++)
+		if(indisponivel[i] == '1' || indisponivel[i] == '2' || indisponivel[i] == '3' || indisponivel[i] == '4' || indisponivel[i] == '5' || indisponivel[i] == '6' || indisponivel[i] == '7' || indisponivel[i] == '8' || indisponivel[i] == '9' || indisponivel[i] == '0')   // identificando se eh numero
+		{
+			horario[j] = indisponivel[i]-48;   // alocando os numeros como int
+			j++;   // age como o tamanha atual do vetor, o real tera a metade (ver abaixo)
+		}
+
+	// Acima, os numeros foram separados individualmente ('08' foi alocado como '0' e '8', por exemplo), agora serao reagrupados:
+	for(i = 0, tam = 0 ; i < j ; i += 2, tam++){
+		k = horario[i]*10 + horario[i+1];
+		horario[tam] = k;
+	}
+
+	return tam; // o tamanho real do vetor, somente a parte dos numeros reagrupados
 }
 
 /*
