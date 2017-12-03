@@ -38,7 +38,7 @@ typedef struct cliente
 {
     char     nome[DIM];   // o nome do cliente
     int      id;          // o número de identificação do cliente
-    long int fone;        // o número de telefone do cliente
+    long long int fone;        // o número de telefone do cliente
     int      idade;       // a idade do cliente
     char     medico[DIM]; // o médico pelo qual o cliente deseja ser atendido
 } cliente;
@@ -78,7 +78,7 @@ int main(int argv, char *argc[])
 	scanf("%d", &conjunto);
 
 	LerDadosMedicos(dm, medicos, &nMed, conjunto);
-	LerDadosClientes(lp1, 1, clientes1, &nCl1, conjunto);
+	//LerDadosClientes(lp1, 1, clientes1, &nCl1, conjunto);
 	LerDadosClientes(lp2, 2, clientes2, &nCl2, conjunto);
 	LerDadosClientes(lp3, 3, clientes3, &nCl3, conjunto);
 	LerDadosClientes(lp4, 4, clientes4, &nCl4, conjunto);
@@ -199,13 +199,11 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 
 void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int conjunto){
 
-	int  i, j, k;           // variáveis de incrementação
+	int  i;          // variáveis de incrementação
 	int nClien;				// numero total de clientes
 
 	// Variáveis que auxiliaram na construção dos clientes:
-	int anoNasc;
-	char nascimento[DIM];
-	int ano[4];
+	int dia, mes, ano;
 
 	// Inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido:
 	switch(conjunto){
@@ -289,13 +287,9 @@ void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int
 	// Extraindo informacoes dos clientes:
 	nClien = 0;
 	do{
-		fscanf(dados, "%[^\n]\n%d\n%ld\n%[^\n]\n%[^\n]\n", clientes[nClien].nome, &clientes[nClien].id, &clientes[nClien].fone, nascimento, clientes[nClien].medico);
+		fscanf(dados, "%[^\n]\n%d\n%lld\n%d %d %d\n%[^\n]\n", clientes[nClien].nome, &clientes[nClien].id, &clientes[nClien].fone, &dia, &mes, &ano, clientes[nClien].medico);
 
-		for(i = 6 ; i < 10 ; i++)
-			ano[i-6] = nascimento[i]-48;
-
-		anoNasc = ano[0]*1000 + ano[1]*100 + ano[2]*10 + ano[3];
-		clientes[nClien].idade = 2017 - anoNasc;
+		clientes[nClien].idade = 2017 - ano;
 
 		nClien++; // Atualizando o numero de clientes
 
@@ -306,8 +300,8 @@ void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int
 	fclose(dados); // fechando o arquivo
 
 	// Impressao para teste
-	//for(i = 0 ; i < nClien ; i++)
-	//	printf("%s\n%d\n%ld\n%d\n%s\n%d\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico, nClien);
+	for(i = 0 ; i < nClien ; i++)
+		printf("%s\n%d\n%lld\n%d\n%s\n%d\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico, nClien);
 
 
 }
