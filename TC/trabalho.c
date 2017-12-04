@@ -7,7 +7,7 @@ Grupo: Alan Herculano Diniz e Rafael Belmock Pedruzzi
 	- Ler um arquivo de texto com dados médicos e instanciar e inicializar médicos; (praticamente pronto)
 	- Ler um .txt com dados de clientes e modificar as agendas médicas; (praticamente pronto)
 	- Criar um arquivo de texto com as agendas médicas de cada semana;
-	- Verificar a especialidade com mais consultas; (pronto)
+	- Verificar a especialidade com mais consultas; 
 	- Verificar especialidade mais procurada por faixa etária; (0 a 25, 26 a 50, 51 a 75 e 76 a 100)
 */
 
@@ -75,8 +75,9 @@ char *EspecMaisRequisitada(agMedico *, int);	   			 // Função que verifica a e
 char *EspecPorFaixaEtaria (agMedico *, int, cliente *, int); // Função que verifica a especialidade mais procurada para cada faixa etária
 
 // Funções auxiliares:
-int  ConsultasMarcadas(agMedico);               // Calcula a quantidade de consultas marcadas que um médico possui em sua agenda
-void RemoverRepetidos (conslPorEspec *, int *); // Remove elementos repetidos em um array de relações consulta-especialidade
+int  ConsultasMarcadas(agMedico);                    // Calcula a quantidade de consultas marcadas que um médico possui em sua agenda
+void RemoverRepetidos (conslPorEspec *, int *);      // Remove os itens repetidos de um array de relações especialidade-número de consultas
+void RemoverElemento  (conslPorEspec *, int *, int); // Remove um elemento especcífico de um array
 
 int main(int *argv, char *argc[])
 {
@@ -105,6 +106,8 @@ int main(int *argv, char *argc[])
 
 	LerDadosClientes(lp4, 4, clientes4, &nCl4, conjunto);
 	RelacMedClientes(medicos, nMed, clientes4, nCl4);
+
+	printf("Especialidade mais requisitada: %s\n", EspecMaisRequisitada(medicos, nMed));
 	return 0;
 }
 
@@ -448,32 +451,25 @@ void RelacMedClientes(agMedico medicos[], int ml, cliente clientes[], int cl)
 		for (j = 0; j < ml; j++) // Procurar no array de médicos um que seja o mesmo que o cliente deseja
 			if (strcmp(clientes[i].medico, medicos[j].nome) == 0)
 				MarcarConsulta(medicos[j], clientes[i]); // E então marcar uma consulta entre o médico e o cliente em questão
+	for (i = 0; i < ml; i++)
+	{
+		ImprimirAgenda(medicos[i].agenda);
+		printf("\n");
+	}
 }
 
 void MarcarConsulta(agMedico m, cliente c)
 {
 	int i, j;					  // variáveis de incrementação
-	int semVagas = 0;			  // contador de horários ocupados ou indisponíveis
-	if (strcmp(m.nome, c.medico) == 0) // verificando se o médico é o que o cliente deseja marcar consulta
-	{
-		// Mudando o primeiro horário vago encontrado se houver horários livres
-		for (i = 0; i < H; i++)
-			for (j = 0; j < D; j++)
-				if (m.agenda[i][j] == 0)
-				{
-					m.agenda[i][j] = c.id;
-					break;
-				}
-				else
-					semVagas++;
-		if (semVagas == H * D)
-			printf("O medico %s esta com a agenda toda ocupada para o cliente %s.\n", m.nome, c.nome); // Mensagem de erro se a agenda estiver toda ocupada
-		return;
-	}
-	else
-	{
-		printf("Erro: o cliente %s nao quer consulta com esse medico %s.\n", c.nome, m.nome); // Mensagem de erro se forem médicos diferentes
-	}
+	
+	// Procurando por um horário que esteja vago:
+	for (i = 0; i < H; i++)
+		for (j = 0; j < D; j++)
+			if (m.agenda[i][j] == 0)
+			{
+				m.agenda[i][j] = c.id;
+				break;
+			}
 }
 
 char *MedicoMaisOcupado(agMedico medicos[], int ml)
@@ -498,40 +494,25 @@ char *MedicoMaisOcupado(agMedico medicos[], int ml)
 
 char *EspecMaisRequisitada(agMedico medicos[], int ml)
 {
-	int i, j, k;                         // variáveis de incrementação
+	int i;                               // variável de incrementação
 	int qEspec;                          // quantidade de especialidades médicas existentes
 	int consulMed[DIM];                  // quantidade de consultas de cada médico
 	char especialidades[DIM][DIM];       // contém todas as especialidades de cada médico (com as posições correspondentes)
 	conslPorEspec reqEspec;		         // especialidade mais requisitada.
 	conslPorEspec consultaPorEspec[DIM]; // Relacionará a quantidade de consultas por especialidade médica existente no array de médicos
 
-	// Colocar todas as especialidades existentes em um array de strings
-	for (i = 0; i < ml; i++)
-		strcpy(especialidades[i], medicos[i].especialidade);
-	
-	// Contar as consultas de cada médico:
-	for (i = 0; i < ml; i++)
-		consulMed[i] = ConsultasMarcadas(medicos[i]);	
-
-	// Armazenar informações no array de relação consulta-especialidade:
-	for (i = 0; i < ml; i++)
-		consultaPorEspec[i] = ConstruirContadorConsl(especialidades[i], consulMed[i]);
-	
-	// Procurar e remover por repetições de especialidades:
 	qEspec = ml;
+	for (i = 0; i < ml; i++)
+		consultaPorEspec[i] = ConstruirContadorConsl(medicos[i].especialidade, ConsultasMarcadas(medicos[i]));
+
 	RemoverRepetidos(consultaPorEspec, &qEspec);
-
-	for (i = 0; i < qEspec; i++)
-		printf("%s\n", consultaPorEspec[i].especialidade);
-
-	for (i = 0; i < qEspec; i++)
-		printf("%d\n", consultaPorEspec[i].numConsultas);
 
 	reqEspec = ConstruirContadorConsl(consultaPorEspec[0].especialidade, consultaPorEspec[0].numConsultas);
 	for (i = 1; i < qEspec; i++)
 		if (consultaPorEspec[i].numConsultas > reqEspec.numConsultas)
-			reqEspec = ConstruirContadorConsl(consultaPorEspec[i].especialidade, consultaPorEspec[i].numConsultas);
-	for (i = 0; i < qEspec; i++)
+			reqEspec = ConstruirContadorConsl(consultaPorEspec[0].especialidade, consultaPorEspec[0].numConsultas);
+	
+	for (i = 0; i < ml; i++)
 		if (strcmp(medicos[i].especialidade, reqEspec.especialidade) == 0)
 			return medicos[i].especialidade;
 }
@@ -548,20 +529,23 @@ int ConsultasMarcadas(agMedico medico)
 	return consultas;
 }
 
-void RemoverRepetidos(conslPorEspec c[DIM], int *l)
+void RemoverRepetidos(conslPorEspec eNc[], int *qE)
 {
-	int i, j, k; // variáveis de incrementação
+	int i, j; // variáveis de incrementação
 
-	for (i = 0; i < *l; i++)
-		printf("%s\n", c[i].especialidade);
-
-	for (i = *l; i >= 0; i--)
+	for (i = *qE - 1; i >= 0; i--)
 		for (j = 0; j < i; j++)
-			if (strcmp(c[j].especialidade, c[i].especialidade) == 0 && c[j].especialidade != NULL && c[i].especialidade != NULL)
+			if (strcmp(eNc[j].especialidade, eNc[i].especialidade) == 0)
 			{
-				c[j].numConsultas += c[i].numConsultas;
-				for (k = j + 1; k < *l; k++)
-					c[k] = ConstruirContadorConsl(c[k].especialidade, c[k].numConsultas);
-				*l--;
+				eNc[j].numConsultas += eNc[i].numConsultas;
+				RemoverElemento(eNc, qE, i);
 			}
+}
+
+void RemoverElemento(conslPorEspec a[], int *l, int i)
+{
+	int j; // variável de incrementação
+	for (j = i; j < *l - 1; j++)
+		a[j] = ConstruirContadorConsl(a[j + 1].especialidade, a[j + 1].numConsultas);
+	*l--;
 }
