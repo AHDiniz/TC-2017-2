@@ -78,7 +78,7 @@ int main(int argv, char *argc[])
 	scanf("%d", &conjunto);
 
 	LerDadosMedicos(dm, medicos, &nMed, conjunto);
-	//LerDadosClientes(lp1, 1, clientes1, &nCl1, conjunto);
+	LerDadosClientes(lp1, 1, clientes1, &nCl1, conjunto);
 	LerDadosClientes(lp2, 2, clientes2, &nCl2, conjunto);
 	LerDadosClientes(lp3, 3, clientes3, &nCl3, conjunto);
 	LerDadosClientes(lp4, 4, clientes4, &nCl4, conjunto);
@@ -203,7 +203,9 @@ void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int
 	int nClien;				// numero total de clientes
 
 	// Variáveis que auxiliaram na construção dos clientes:
-	int dia, mes, ano;
+	int dia, mes, ano, tam;
+	int dataI[DIM];
+	char dataC[DIM];
 
 	// Inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido:
 	switch(conjunto){
@@ -287,7 +289,11 @@ void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int
 	// Extraindo informacoes dos clientes:
 	nClien = 0;
 	do{
-		fscanf(dados, "%[^\n]\n%d\n%lld\n%d %d %d\n%[^\n]\n", clientes[nClien].nome, &clientes[nClien].id, &clientes[nClien].fone, &dia, &mes, &ano, clientes[nClien].medico);
+		fscanf(dados, "%[^\n]\n%d\n%lld\n%[^\n]\n%[^\n]\n", clientes[nClien].nome, &clientes[nClien].id, &clientes[nClien].fone, dataC, clientes[nClien].medico);
+
+		tam = SomenteInts(dataI, dataC);
+
+		ano = dataI[2]*100 + dataI[3];
 
 		clientes[nClien].idade = 2017 - ano;
 
@@ -310,7 +316,7 @@ int SomenteInts(int horario[], char indisponivel[]){
 
 	int i, j, k, tam;
 
-	for(i = 2, j = 0 ; i < strlen(indisponivel) ; i++)
+	for(i = 0, j = 0 ; i < strlen(indisponivel) ; i++)
 		if(indisponivel[i] == '1' || indisponivel[i] == '2' || indisponivel[i] == '3' || indisponivel[i] == '4' || indisponivel[i] == '5' || indisponivel[i] == '6' || indisponivel[i] == '7' || indisponivel[i] == '8' || indisponivel[i] == '9' || indisponivel[i] == '0')   // identificando se eh numero
 		{
 			horario[j] = indisponivel[i]-48;   // alocando os numeros como int
