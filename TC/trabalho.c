@@ -198,10 +198,10 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 	int nMedc;   // numero total de medicos
 
 	// Variáveis auxiliares para construção dos médicos:
-	int dia;				// armazena o dia(da semana) com horarios indisponiveis, atualizada numa recursao
-	char indisponivel[DIM]; // armazena a string dos horarios indisponiveis (relativos ao dia)
-	int horario[DIM];		// armazena os horarios indisponiveis ("filtra o vetor indisponiveis")
-	int tam;				// armazena o tamanho do vetor horario
+	int dia;                  // armazena o dia(da semana) com horarios indisponiveis, atualizada numa recursao
+	char indisponivel[DIM];   // armazena a string dos horarios indisponiveis (relativos ao dia)
+	int horario[DIM];         // armazena os horarios indisponiveis ("filtra o vetor indisponiveis")
+	int tam;                  // armazena o tamanho do vetor horario
 
 	// Inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido:
 	switch (conjunto)
@@ -240,7 +240,7 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 
 		// Extraindo os horarios indisponiveis:
 		// Preparando a recursão
-		dia = 0;										// inicializa a variavel dia, so se altera caso a proxima linha escaneada comece com um numero, consegue advinhar qual?(dica: eh nome de uma variavel)
+		dia = 0;   // inicializa a variavel dia, so se altera caso a proxima linha escaneada comece com um numero, consegue advinhar qual?(dica: eh nome de uma variavel)
 		fscanf(dados, "%d %[^\n]", &dia, indisponivel); // extrai os primeiros horarios indisponíveis e seus respectivos dias. Caso nao tenha, 'dia' se mantém igual a 0.
 
 		while (dia != 0)
@@ -275,13 +275,12 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int conjunto)
 {
 
-	int i, j, k; // variáveis de incrementação
+	int i; 	     // variáveis de incrementação
 	int nClien;  // numero total de clientes
 
 	// Variáveis que auxiliaram na construção dos clientes:
-	int anoNasc;
-	char nascimento[DIM];
-	int ano[4];
+	int dataI[DIM];
+	char dataC[DIM];
 
 	// Inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido:
 	switch (conjunto)
@@ -404,13 +403,13 @@ void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int
 	nClien = 0;
 	do
 	{
-		fscanf(dados, "%[^\n]\n%d\n%lld\n%[^\n]\n%[^\n]\n", clientes[nClien].nome, &clientes[nClien].id, &clientes[nClien].fone, nascimento, clientes[nClien].medico);
+		fscanf(dados, "%[^\n]\n%d\n%lld\n%[^\n]\n%[^\n]\n", clientes[nClien].nome, &clientes[nClien].id, &clientes[nClien].fone, dataC, clientes[nClien].medico);
 
-		for (i = 6; i < 10; i++)
-			ano[i - 6] = nascimento[i] - 48;
+		SomenteInts(dataI, dataC);
 
-		anoNasc = ano[0] * 1000 + ano[1] * 100 + ano[2] * 10 + ano[3];
-		clientes[nClien].idade = 2017 - anoNasc;
+		dataI[2] = dataI[2]*100 + dataI[3];
+
+		clientes[nClien].idade = CalculoIdade(dataI);
 
 		nClien++; // Atualizando o numero de clientes
 
