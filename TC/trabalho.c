@@ -36,11 +36,11 @@ typedef struct agMedico
 // Definição das características relevantes de um cliente:
 typedef struct cliente
 {
-    char     nome[DIM];   // o nome do cliente
-    int      id;          // o número de identificação do cliente
-    long long int fone;        // o número de telefone do cliente
-    int      idade;       // a idade do cliente
-    char     medico[DIM]; // o médico pelo qual o cliente deseja ser atendido
+    char            nome[DIM];   // o nome do cliente
+    int             id;          // o número de identificação do cliente
+    long long int   fone;        // o número de telefone do cliente
+    int             idade;       // a idade do cliente
+    char            medico[DIM]; // o médico pelo qual o cliente deseja ser atendido
 } cliente;
 
 // Funções provisórias:
@@ -291,11 +291,11 @@ void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int
 	do{
 		fscanf(dados, "%[^\n]\n%d\n%lld\n%[^\n]\n%[^\n]\n", clientes[nClien].nome, &clientes[nClien].id, &clientes[nClien].fone, dataC, clientes[nClien].medico);
 
-		tam = SomenteInts(dataI, dataC);
+		SomenteInts(dataI, dataC);
 
-		ano = dataI[2]*100 + dataI[3];
+		dataI[2] = dataI[2]*100 + dataI[3];
 
-		clientes[nClien].idade = 2017 - ano;
+		clientes[nClien].idade = 2017 - dataI[2];
 
 		nClien++; // Atualizando o numero de clientes
 
@@ -307,7 +307,7 @@ void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int
 
 	// Impressao para teste
 	for(i = 0 ; i < nClien ; i++)
-		printf("%s\n%d\n%lld\n%d\n%s\n%d\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico, nClien);
+		printf("%s\n%d\n%lld\n%d\n%s\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico);
 
 
 }
