@@ -5,39 +5,45 @@
 
 #define DIM 30
 
-struct tm IdadeEmCalend(char data[])
+struct tm IdadeEmCalend(int data[])
 {
     struct tm cData; // data em um formato de calendário
-    char aux[DIM];   // variável que ajudará na construção da data
     
     // Calculando o dia do nascimento:
-    aux[0] = data[0];
-    aux[1] = data[1];
-    cData.tm_mday = (int)strtol(aux, NULL, 10);
-    printf("Dia: %d.\n", cData.tm_mday);
+    cData.tm_mday = data[0];
 
     // Calculando o mês do nascimento:
-    aux[0] = data[3];
-    aux[1] = data[4];
-    cData.tm_mon = (int)strtol(aux, NULL, 10) - 1; // o mês varia de 0 a 11, e não de 1 a 12.
-    printf("Mes: %d.\n", cData.tm_mon + 1);
+    cData.tm_mon = data[1];
 
     // Calculando o ano do nascimento:
-    for (int i = 0; i <= 4; i++)
-        aux[i] = data[i + 5];
-    cData.tm_year = (int)strtol(aux, NULL, 10);
-    printf("Ano: %d.\n", cData.tm_year);
+    cData.tm_year = data[2];
 
     return cData;
 }
 
 int CalcularIdade(struct tm nasc)
 {
-    time_t tNasc = mktime(&nasc); // data de nascimento da pessoa no tipo algébrico de tempo
-    time_t hoje = time(NULL);     // Pegando a data atual
-    
-    // Diferença em segundos das idades
-    double difInSec = difftime(hoje, tNasc);
+    // Ajudarão no cálculo da idade:
+    time_t hoje; struct tm *cHoje; 
+    int idade = 0; // variável de retorno
 
-    return 0; 
+    // Achando a data atual:
+    time(&hoje);
+    cHoje = localtime(&hoje);
+    cHoje->tm_year += 1900;
+
+    idade = cHoje->tm_year - nasc.tm_year; // Inicialmente, a idade será a diferença dos anos
+
+    if (nasc.tm_mon > cHoje->tm_mon) // Se o mês de nascimento for maior que o da data atual, quer dizer que a pessoa já teve seu aniversário
+        idade++;
+    else if (nasc.tm_mon == cHoje->tm_mon && nasc.tm_mday > cHoje->tm_mday) // Isso também acontece se for o mesmo mês, mas o dia do nascimento for maior que o dia de hoje
+        idade++;
+    
+    return idade;
+}
+
+int CalculoIdade(int data[])
+{
+    int idade = CalcularIdade(IdadeEmCalend(data));
+    return idade;
 }

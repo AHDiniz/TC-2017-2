@@ -91,26 +91,22 @@ int main(int *argv, char *argc[])
 	cliente clientes3[CL];			  // vetor de clientes da semana 3
 	cliente clientes4[CL];			  // vetor de clientes da semana 4
 
-	char *tData = "02 01 1990";
-	IdadeEmCalend(tData);
+	// Teste de função para calculo de idade:
+	int dataTeste[] = {2, 1, 1990};
+	int idade = CalculoIdade(dataTeste);
+	printf("Idade: %d.\n", idade);	
 
 	/*printf("Informe o numero do conjunto a ser avaliado (0 - 5): ");
 	scanf("%d", &conjunto);
-
 	LerDadosMedicos(dm, medicos, &nMed, conjunto);
-
 	LerDadosClientes(lp1, 1, clientes1, &nCl1, conjunto);
 	RelacMedClientes(medicos, nMed, clientes1, nCl1);
-
 	LerDadosClientes(lp2, 2, clientes2, &nCl2, conjunto);
 	RelacMedClientes(medicos, nMed, clientes2, nCl2);
-
 	LerDadosClientes(lp3, 3, clientes3, &nCl3, conjunto);
 	RelacMedClientes(medicos, nMed, clientes3, nCl3);
-
 	LerDadosClientes(lp4, 4, clientes4, &nCl4, conjunto);
 	RelacMedClientes(medicos, nMed, clientes4, nCl4);
-
 	printf("Especialidade mais requisitada: %s\n", EspecMaisRequisitada(medicos, nMed));*/
 	return 0;
 }
@@ -408,7 +404,7 @@ void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int
 	nClien = 0;
 	do
 	{
-		fscanf(dados, "%[^\n]\n%d\n%ld\n%[^\n]\n%[^\n]\n", clientes[nClien].nome, &clientes[nClien].id, &clientes[nClien].fone, nascimento, clientes[nClien].medico);
+		fscanf(dados, "%[^\n]\n%d\n%lld\n%[^\n]\n%[^\n]\n", clientes[nClien].nome, &clientes[nClien].id, &clientes[nClien].fone, nascimento, clientes[nClien].medico);
 
 		for (i = 6; i < 10; i++)
 			ano[i - 6] = nascimento[i] - 48;
@@ -426,7 +422,7 @@ void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int
 
 	// Impressao para teste
 	for (i = 0; i < nClien; i++)
-		printf("%s\n%d\n%ld\n%d\n%s\n%d\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico, nClien);
+		printf("%s\n%d\n%lld\n%d\n%s\n%d\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico, nClien);
 }
 
 void RelacMedClientes(agMedico medicos[], int ml, cliente clientes[], int cl)
@@ -508,7 +504,6 @@ char *EspecPorFaixaEtaria(agMedico medicos[], int ml, cliente clientes[], int cl
 	/*O que deve ser feito:
 		1 - Separar os clientes por faixa etária (provavelmente em uma matriz);
 		2 - Calcular a especialidade mais requisitada para cada faixa etária:
-
 		3 - Concatenar as strings em somente uma de resposta:*/
 }
 
