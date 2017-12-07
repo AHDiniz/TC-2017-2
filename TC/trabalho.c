@@ -503,7 +503,11 @@ char *EspecPorFaixaEtaria(agMedico medicos[], int ml, cliente clientes[], int cl
 	/*O que deve ser feito:
 		1 - Separar os clientes por faixa etária (provavelmente em uma matriz);
 		2 - Calcular a especialidade mais requisitada para cada faixa etária:
-		3 - Concatenar as strings em somente uma de resposta:*/
+			a) Em cada linha da matriz, criar um array de médicos
+			b) Calcular a especialidade mais requisitada para cada array de médicos e printar como a faixa etária
+	*/
+
+	cliente clientesPorFaixa[4][DIM];
 }
 
 int ConsultasMarcadas(agMedico medico)
