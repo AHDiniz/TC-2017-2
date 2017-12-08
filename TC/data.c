@@ -1,14 +1,14 @@
-#include  <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include   "data.h"
+#include "data.h"
 
 #define DIM 30
 
 struct tm IdadeEmCalend(int data[])
 {
     struct tm cData; // data em um formato de calendário
-    
+
     // Calculando o dia do nascimento:
     cData.tm_mday = data[0];
 
@@ -24,7 +24,8 @@ struct tm IdadeEmCalend(int data[])
 int CalcularIdade(struct tm nasc)
 {
     // Ajudarão no cálculo da idade:
-    time_t hoje; struct tm *cHoje; 
+    time_t hoje;
+    struct tm *cHoje;
     int idade = 0; // variável de retorno
 
     // Achando a data atual:
@@ -38,7 +39,7 @@ int CalcularIdade(struct tm nasc)
         idade++;
     else if (nasc.tm_mon == cHoje->tm_mon && nasc.tm_mday > cHoje->tm_mday) // Isso também acontece se for o mesmo mês, mas o dia do nascimento for maior que o dia de hoje
         idade++;
-    
+
     return idade;
 }
 
