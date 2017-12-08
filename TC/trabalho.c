@@ -52,10 +52,13 @@ void ConstruirAgenda(int (*)[D], int ,int *, int);   // função que acressenta 
 
 // Funções para ler arquivos de texto:
 void LerDadosMedicos(FILE *, agMedico *, int *, int);
-void LerDadosClientes(FILE *, int, cliente *, int *, int);
+void LerDadosClientes(FILE *, cliente *, cliente *, cliente *, cliente *, int *, int *, int *, int *, int);
 
 // Funcoes auxiliares de LerDadosMedicos:
 int SomenteInts(int *, char *);   // transfere os numeros de um vetor char para um vetor int e retorna seu tamanho
+
+// Funcoes auxiliares de LerDadosClientes:
+void LerClientes(FILE *, cliente *, int *);
 
 // Funções que modificam informações de médicos ou clientes:
 //void MarcarConsulta(agMedico, cliente); // Função que marca uma consulta entre médico e cliente
@@ -65,7 +68,7 @@ int main(int argv, char *argc[])
 {
 	// Por enquanto somente testes:
 	// Alan, nao remova meus comentarios zuados, eles dao vida pro projeto! (e nao eh como se fossem frazes aleatorias jogadas entre parenteses)
-	FILE *dm, *lp1, *lp2, *lp3, *lp4;
+	FILE *dados;
 	int conjunto;	                    // conjunto de exemplos a ser avaliado
 	int nMed, nCl1, nCl2, nCl3, nCl4;   // numero total de medicos e clientes
 	agMedico medicos[ML];               // vetor de medicos
@@ -77,11 +80,8 @@ int main(int argv, char *argc[])
 	printf("Informe o numero do conjunto a ser avaliado (0 - 5): ");
 	scanf("%d", &conjunto);
 
-	LerDadosMedicos(dm, medicos, &nMed, conjunto);
-	LerDadosClientes(lp1, 1, clientes1, &nCl1, conjunto);
-	LerDadosClientes(lp2, 2, clientes2, &nCl2, conjunto);
-	LerDadosClientes(lp3, 3, clientes3, &nCl3, conjunto);
-	LerDadosClientes(lp4, 4, clientes4, &nCl4, conjunto);
+	LerDadosMedicos(dados, medicos, &nMed, conjunto);
+	LerDadosClientes(dados, clientes1, clientes2, clientes3, clientes4, &nCl1, &nCl2, &nCl3, &nCl4, conjunto);
 	return 0;
 }
 
@@ -197,87 +197,90 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 
 }
 
-void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int conjunto){
+void LerDadosClientes(FILE *dados, cliente clientes1[], cliente clientes2[], cliente clientes3[], cliente clientes4[], int *nCl1, int *nCl2, int *nCl3, int *nCl4, int conjunto){
 
-	int  i;          // variáveis de incrementação
-	int nClien;				// numero total de clientes
+	// Inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido:
+	switch(conjunto){
+		case 0 : 
+				dados = fopen("Conjunto0/listaPacientes-Semana1.txt", "r");
+				LerClientes(dados, clientes1, nCl1);
+				dados = fopen("Conjunto0/listaPacientes-Semana2.txt", "r");
+				LerClientes(dados, clientes2, nCl2);
+				dados = fopen("Conjunto0/listaPacientes-Semana3.txt", "r");
+				LerClientes(dados, clientes3, nCl3);
+				dados = fopen("Conjunto0/listaPacientes-Semana4.txt", "r");
+				LerClientes(dados, clientes4, nCl4);
+				fclose(dados);
+				break;
+		case 1 : 
+				dados = fopen("Conjunto1/listaPacientes-Semana1.txt", "r");
+				LerClientes(dados, clientes1, nCl1);
+				dados = fopen("Conjunto1/listaPacientes-Semana2.txt", "r");
+				LerClientes(dados, clientes2, nCl2);
+				dados = fopen("Conjunto1/listaPacientes-Semana3.txt", "r");
+				LerClientes(dados, clientes3, nCl3);
+				dados = fopen("Conjunto1/listaPacientes-Semana4.txt", "r");
+				LerClientes(dados, clientes4, nCl4);
+				fclose(dados);
+				break;
+		case 2 : 
+				dados = fopen("Conjunto2/listaPacientes-Semana1.txt", "r");
+				LerClientes(dados, clientes1, nCl1);
+				dados = fopen("Conjunto2/listaPacientes-Semana2.txt", "r");
+				LerClientes(dados, clientes2, nCl2);
+				dados = fopen("Conjunto2/listaPacientes-Semana3.txt", "r");
+				LerClientes(dados, clientes3, nCl3);
+				dados = fopen("Conjunto2/listaPacientes-Semana4.txt", "r");
+				LerClientes(dados, clientes4, nCl4);
+				fclose(dados);
+				break;
+		case 3 : 
+				dados = fopen("Conjunto3/listaPacientes-Semana1.txt", "r");
+				LerClientes(dados, clientes1, nCl1);
+				dados = fopen("Conjunto3/listaPacientes-Semana2.txt", "r");
+				LerClientes(dados, clientes2, nCl2);
+				dados = fopen("Conjunto3/listaPacientes-Semana3.txt", "r");
+				LerClientes(dados, clientes3, nCl3);
+				dados = fopen("Conjunto3/listaPacientes-Semana4.txt", "r");
+				LerClientes(dados, clientes4, nCl4);
+				fclose(dados);
+				break;
+		case 4 : 
+				dados = fopen("Conjunto4/listaPacientes-Semana1.txt", "r");
+				LerClientes(dados, clientes1, nCl1);
+				dados = fopen("Conjunto4/listaPacientes-Semana2.txt", "r");
+				LerClientes(dados, clientes2, nCl2);
+				dados = fopen("Conjunto4/listaPacientes-Semana3.txt", "r");
+				LerClientes(dados, clientes3, nCl3);
+				dados = fopen("Conjunto4/listaPacientes-Semana4.txt", "r");
+				LerClientes(dados, clientes4, nCl4);
+				fclose(dados);
+				break;
+		case 5 : 
+				dados = fopen("Conjunto5/listaPacientes-Semana1.txt", "r");
+				LerClientes(dados, clientes1, nCl1);
+				dados = fopen("Conjunto5/listaPacientes-Semana2.txt", "r");
+				LerClientes(dados, clientes2, nCl2);
+				dados = fopen("Conjunto5/listaPacientes-Semana3.txt", "r");
+				LerClientes(dados, clientes3, nCl3);
+				dados = fopen("Conjunto5/listaPacientes-Semana4.txt", "r");
+				LerClientes(dados, clientes4, nCl4);
+				fclose(dados);
+				break;
+		default: printf("Conjunto nao existe!\n");
+				exit(0);
+	}
+}
+
+void LerClientes(FILE *dados, cliente clientes[], int *nCl){
+
+	int  i;       // variáveis de incrementação
+	int nClien;	  // numero total de clientes
 
 	// Variáveis que auxiliaram na construção dos clientes:
 	int dia, mes, ano, tam;
 	int dataI[DIM];
 	char dataC[DIM];
-
-	// Inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido:
-	switch(conjunto){
-		case 0 : switch(semana){
-					case 1 : dados = fopen("Conjunto0/listaPacientes-Semana1.txt", "r");
-							break;
-					case 2 : dados = fopen("Conjunto0/listaPacientes-Semana2.txt", "r");
-							break;
-					case 3 : dados = fopen("Conjunto0/listaPacientes-Semana3.txt", "r");
-							break;
-					case 4 : dados = fopen("Conjunto0/listaPacientes-Semana4.txt", "r");
-							break;
-				}
-				break;
-		case 1 : switch(semana){
-					case 1 : dados = fopen("Conjunto1/listaPacientes-Semana1.txt", "r");
-							break;
-					case 2 : dados = fopen("Conjunto1/listaPacientes-Semana2.txt", "r");
-							break;
-					case 3 : dados = fopen("Conjunto1/listaPacientes-Semana3.txt", "r");
-							break;
-					case 4 : dados = fopen("Conjunto1/listaPacientes-Semana4.txt", "r");
-							break;
-				}
-				break;
-		case 2 : switch(semana){
-					case 1 : dados = fopen("Conjunto2/listaPacientes-Semana1.txt", "r");
-							break;
-					case 2 : dados = fopen("Conjunto2/listaPacientes-Semana2.txt", "r");
-							break;
-					case 3 : dados = fopen("Conjunto2/listaPacientes-Semana3.txt", "r");
-							break;
-					case 4 : dados = fopen("Conjunto2/listaPacientes-Semana4.txt", "r");
-							break;
-				}
-				break;
-		case 3 : switch(semana){
-					case 1 : dados = fopen("Conjunto3/listaPacientes-Semana1.txt", "r");
-							break;
-					case 2 : dados = fopen("Conjunto3/listaPacientes-Semana2.txt", "r");
-							break;
-					case 3 : dados = fopen("Conjunto3/listaPacientes-Semana3.txt", "r");
-							break;
-					case 4 : dados = fopen("Conjunto3/listaPacientes-Semana4.txt", "r");
-							break;
-				}
-				break;
-		case 4 : switch(semana){
-					case 1 : dados = fopen("Conjunto4/listaPacientes-Semana1.txt", "r");
-							break;
-					case 2 : dados = fopen("Conjunto4/listaPacientes-Semana2.txt", "r");
-							break;
-					case 3 : dados = fopen("Conjunto4/listaPacientes-Semana3.txt", "r");
-							break;
-					case 4 : dados = fopen("Conjunto4/listaPacientes-Semana4.txt", "r");
-							break;
-				}
-				break;
-		case 5 : switch(semana){
-					case 1 : dados = fopen("Conjunto5/listaPacientes-Semana1.txt", "r");
-							break;
-					case 2 : dados = fopen("Conjunto5/listaPacientes-Semana2.txt", "r");
-							break;
-					case 3 : dados = fopen("Conjunto5/listaPacientes-Semana3.txt", "r");
-							break;
-					case 4 : dados = fopen("Conjunto5/listaPacientes-Semana4.txt", "r");
-							break;
-				}
-				break;
-		default: printf("Conjunto nao existe!                                                                                                           ...idiota\n");
-				exit(0);
-	}
 
 	// Verificando se não há erro:
 	if (dados == NULL)
@@ -308,8 +311,6 @@ void LerDadosClientes(FILE *dados, int semana, cliente clientes[], int *nCl, int
 	// Impressao para teste
 	for(i = 0 ; i < nClien ; i++)
 		printf("%s\n%d\n%lld\n%d\n%s\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico);
-
-
 }
 
 int SomenteInts(int horario[], char indisponivel[]){
