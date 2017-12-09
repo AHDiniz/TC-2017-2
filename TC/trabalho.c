@@ -28,17 +28,17 @@ Grupo: Alan Herculano Diniz e Rafael Belmock Pedruzzi
 
 // Funções que relacionam médicos e clientes:
 void RelacMedClientes(agMedico *, int, cliente *, int); // Função que compara um array de médicos com um array de clientes para que a marcação de consultas seja feita de forma correta
-void MarcarConsulta(agMedico *, cliente);			// Função que marca uma consulta entre médico e cliente
+void MarcarConsulta(agMedico *, cliente);				// Função que marca uma consulta entre médico e cliente
 
 // Funções relacinadas com os relatórios:
-char *MedicoMaisOcupado(agMedico *, int);					// Função que verifica o médico com a maior quantidade de consultas na sua agenda
-void  EspecMaisRequisitada(agMedico *, int, int);			// Função que verifica a especialidade com a maior quantidade de consultas marcadas
-char *EspecPorFaixaEtaria(agMedico *, int, cliente *, int); // Função que verifica a especialidade mais procurada para cada faixa etária
+void TabelasMedicos(FILE *dados, agMedico *, cliente *, cliente *, cliente *, cliente *, int, int, int, int, int);
+void SemEspacos(char *, char *);
+void Remove(char *, int);
 
 int main(int *argv, char *argc[])
 {
 	FILE *dados;
-	int conjunto, i;					  // conjunto de exemplos a ser avaliado
+	int conjunto, i;				  // conjunto de exemplos a ser avaliado
 	int nMed, nCl1, nCl2, nCl3, nCl4; // numero total de medicos e clientes
 	agMedico medicos[ML];			  // vetor de medicos
 	cliente clientes1[CL];			  // vetor de clientes da semana 1
@@ -52,7 +52,7 @@ int main(int *argv, char *argc[])
 	LerDadosMedicos(dados, medicos, &nMed, conjunto);
 	LerDadosClientes(dados, clientes1, clientes2, clientes3, clientes4, &nCl1, &nCl2, &nCl3, &nCl4, conjunto);
 
-	RelacMedClientes(medicos, nMed, clientes1, nCl1);
+	TabelasMedicos(dados, medicos, clientes1, clientes2, clientes3, clientes4, nMed, nCl1, nCl2, nCl3, nCl4);
 
 	return 0;
 }
@@ -65,16 +65,11 @@ void RelacMedClientes(agMedico medicos[], int ml, cliente clientes[], int cl)
 		for (j = 0; j < ml; j++) // Procurar no array de médicos um que seja o mesmo que o cliente deseja
 			if (strcmp(clientes[i].medico, medicos[j].nome) == 0)
 				MarcarConsulta(&medicos[j], clientes[i]); // E então marcar uma consulta entre o médico e o cliente em questão
-	for (i = 0; i < ml; i++)
-	{
-		ImprimirAgenda(medicos[i].agenda);
-		printf("\n");
-	}
 }
 
 void MarcarConsulta(agMedico *m, cliente c)
 {
-	int i, j, k=0; // variáveis de incrementação
+	int i, j, k = 0; // variáveis de incrementação
 
 	// Procurando por um horário que esteja vago:
 	for (i = 0; i < H && k == 0; i++)
@@ -87,52 +82,46 @@ void MarcarConsulta(agMedico *m, cliente c)
 			}
 }
 
-char *MedicoMaisOcupado(agMedico medicos[], int ml)
+void TabelasMedicos(FILE *dados, agMedico medicos[], cliente clientes1[], cliente clientes2[], cliente clientes3[], cliente clientes4[], int nMed, int nCl1, int nCl2, int nCl3, int nCl4)
 {
-	int i, j, k;	   // variáveis de incrementação
-	int consultas = 0; // quantidade de consultas do médico da iteração atual do loop
-	int consulAnt = 0; // quantidade de consultas do médico da iteração anterior
-	int desejado = 0;  // médico com a maior quantidade de consultas marcadas
 
-	// Procurando o médico com a maior quantidade de consultas:
-	for (i = 0; i < ml; i++) // Varrendo o array de médicos
-	{
-		consultas = ConsultasMarcadas(medicos[i]); // Calculando a quantidade de consultas marcadas
-		// Atualizando os valores do médico desejado e das consultas anterior e atual:
-		consulAnt = consultas;
-		consultas = 0;
-		if (consultas >= consulAnt)
-			desejado = i;
-	}
-	return medicos[desejado].nome; // retornando o médico mais procurado
-}
+	int i, j; // variáveis de incrementação
+	char nomeMed[DIM+4];
 
-void EspecMaisRequisitada(agMedico medicos[], int ml, int conjunto)
-{
-	int i;								 // variável de incrementação
-	int qEspec;							 // quantidade de especialidades médicas existentes
-	int consulMed[DIM];					 // quantidade de consultas de cada médico
-	char especialidades[DIM][DIM];		 // contém todas as especialidades de cada médico (com as posições correspondentes)
-	conslPorEspec reqEspec;				 // especialidade mais requisitada.
-	conslPorEspec consultaPorEspec[DIM]; // Relacionará a quantidade de consultas por especialidade médica existente no array de médicos
-	FILE *arq;
+	SemEspacos(nomeMed, medicos[0].nome);
+	strcat(nomeMed, ".txt");
 
-	qEspec = ml;
-	for (i = 0; i < ml; i++)
-		consultaPorEspec[i] = ConstruirContadorConsl(medicos[i].especialidade, ConsultasMarcadas(medicos[i]));
+	dados = fopen(nomeMed, "w");
+	fprintf(dados, "Medico: %s\nId: %d\nEspecialidade: %s\n\nQuadro de consultas semanais\n\n", medicos[0].nome, medicos[0].id, medicos[0].especialidade);
 
-	RemoverRepetidos(consultaPorEspec, &qEspec);
+
+	//RelacMedClientes(medicos, nMed, clientes1, nCl1);
 
 	
-		
+
+	fclose(dados);
+	
 }
 
-char *EspecPorFaixaEtaria(agMedico medicos[], int ml, cliente clientes[], int cl)
+void SemEspacos(char d[], char v[])
 {
-	/*O que deve ser feito:
-		1 - Separar os clientes por faixa etária (provavelmente em uma matriz);
-		2 - Calcular a especialidade mais requisitada para cada faixa etária:
-			a) Em cada linha da matriz, criar um array de médicos
-			b) Calcular a especialidade mais requisitada para cada array de médicos e printar como a faixa etária
-	*/
+
+	int i;
+
+	strcpy(d,v);
+
+	d[strlen(d)-1] = '\0';
+
+	for(i = 0 ; i < strlen(d) ; i++)
+		if(d[i] == ' ')
+			Remove(d, i);
+}
+
+void Remove(char d[], int n)
+{
+
+	int i;
+
+	for(i = n ; i < strlen(d) ; i++)
+		d[i] = d[i+1];
 }
