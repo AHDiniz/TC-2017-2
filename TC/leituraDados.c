@@ -102,14 +102,6 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 
     *nMed = nMedc; // eu avisei
     fclose(dados); // fechando o arquivo
-
-    // Impressao para teste (SOMENTE TESTE)
-    for (i = 0; i < nMedc; i++)
-    {
-        printf("%s\n%d\n%s\n", medicos[i].nome, medicos[i].id, medicos[i].especialidade);
-
-        ImprimirAgenda(medicos[i].agenda);
-    }
 }
 
 void LerDadosClientes(FILE *dados, cliente clientes1[], cliente clientes2[], cliente clientes3[], cliente clientes4[], int *nCl1, int *nCl2, int *nCl3, int *nCl4, int conjunto)
@@ -227,8 +219,4 @@ void LerClientes(FILE *dados, cliente clientes[], int *nCl)
     *nCl = nClien;
 
     fclose(dados); // fechando o arquivo
-
-    // Impressao para teste
-    for (i = 0; i < nClien; i++)
-        printf("%s\n%d\n%lld\n%d\n%s\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico);
 }

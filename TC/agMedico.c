@@ -62,13 +62,22 @@ void ConstroiAgenda(int agenda[][D])
         agenda[4][i] = -1;
 }
 
+void ResetAgenda(int agenda[][D])
+{
+    int i, j; // variáveis de incrementação
+    for (i = 0; i < H; i++)
+        for (j = 0; j < D; j++)
+            if (agenda[i][j] != 0 && agenda[i][j] != -1)
+                agenda[i][j] = 0; // Para cada item da matriz que seja um horário vago, ele deixará de ser vago
+}
+
 void ImprimirAgenda(int agenda[][D])
 {
     int i, j;
     for (i = 0; i < H; i++)
     {
         for (j = 0; j < D; j++)
-            printf("%3d", agenda[i][j]);
+            printf(" %3d", agenda[i][j]);
         printf("\n");
     }
 }
@@ -79,41 +88,42 @@ void QSortConsulta(agMedico medicos[], int inicio, int fim)
     agMedico mAux;
     
     int *consultas = (int *)malloc(abs(fim - inicio) * (sizeof(int))); // Construindo dinamicamente um array que terá a quantidade de consultas para cada médico de acordo com a posição
-    for (i = 0; i < abs(fim - inicio); i++) // Populando o array de quantidade de consultas marcadas por médico
-        *(consultas + i) = ConsultasMarcadas(medicos[i]); 
+    for (i = 0; i <= abs(fim - inicio); i++) // Populando o array de quantidade de consultas marcadas por médico
+        *(consultas + i) = ConsultasMarcadas(medicos[i]);
 
-    if (inicio < fim) // Se 
+    if (inicio < fim) // Se o índice inicial for menor que o final, o pivô será escolhido:
     {
         pivot = i = inicio;
         j = fim;
-    }
-
-    while (i < j)
-    {
-        while (*(consultas + i) <= *(consultas + pivot) && i < fim)
-            i++;
-        while (*(consultas + i) > *(consultas + pivot))
-            j--;
-        if (i < j)
+        
+        // Fazendo o quick sort:
+        while (i < j)
         {
-            aux = *(consultas + i);
-            mAux = medicos[i];
-            *(consultas + i) = *(consultas + j);
-            medicos[i] = medicos[j];
-            *(consultas + j) = aux;
-            medicos[j] = mAux;
+            while (*(consultas + i) <= *(consultas + pivot) && i < fim)
+                i++;
+            while (*(consultas + i) > *(consultas + pivot))
+                j--;
+            if (i < j)
+            {
+                aux = *(consultas + i);
+                mAux = medicos[i];
+                *(consultas + i) = *(consultas + j);
+                medicos[i] = medicos[j];
+                *(consultas + j) = aux;
+                medicos[j] = mAux;
+            }
         }
+
+        aux = *(consultas + pivot);
+        mAux = medicos[pivot];
+        *(consultas + pivot) = *(consultas + j);
+        medicos[pivot] = medicos[j];
+        *(consultas + j) = aux;
+        medicos[j] = mAux;
+
+        free(consultas); // Limpando o espaço de memória usado
+
+        QSortConsulta(medicos, inicio, j - 1);
+        QSortConsulta(medicos, j + 1, fim);
     }
-
-    aux = *(consultas + pivot);
-    mAux = medicos[pivot];
-    *(consultas + pivot) = *(consultas + j);
-    medicos[pivot] = medicos[j];
-    *(consultas + j) = aux;
-    medicos[j] = mAux;
-
-    free(consultas);
-
-    QSortConsulta(medicos, inicio, j - 1);
-    QSortConsulta(medicos, j + 1, fim);
 }
