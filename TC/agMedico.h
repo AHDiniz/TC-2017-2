@@ -30,7 +30,4 @@ void ResetAgenda(int (*)[D]);    // Função que reseta uma agenda médica
 // Funçõoes para ler dados específicos em arquivos texto:
 void ConstruirAgenda(int (*)[D], int, int *, int); // Função que cria uma matriz a paartir dos dados de uma agenda médica
 
-// Ordenação de arrays:
-void QSortConsulta(agMedico *, int, int); // Ordenação por seleção tomando como parâmetro a quantidade de consultas
-
 #endif

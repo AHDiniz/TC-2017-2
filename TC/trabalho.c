@@ -19,6 +19,7 @@ Grupo: Alan Herculano Diniz e Rafael Belmock Pedruzzi
 #include "agMedico.h"
 #include "cliente.h"
 #include "leituraDados.h"
+#include "consultaPorMed.h"
 
 #define DIM 30 // tamanho máximo de uma string
 #define H   10 // quantidade de intervalos de uma hora durante o dia (linhas da matriz de agenda de um médico)
@@ -53,9 +54,6 @@ int main(int *argv, char *argc[])
 	LerDadosClientes(dados, clientes1, clientes2, clientes3, clientes4, &nCl1, &nCl2, &nCl3, &nCl4, conjunto);
 
 	RelacMedClientes(medicos, nMed, clientes1, nCl1);
-
-	// RankingMedico(medicos, nMed);
-
 	return 0;
 }
 
@@ -87,17 +85,22 @@ void MarcarConsulta(agMedico *m, cliente c)
 void RankingMedico(agMedico medicos[], int ml)
 {
 	int i; // variável de incrementação
-	
-	QSortConsulta(medicos, 0, ml - 1); // Ordenando o array de médicos de acordo com o número de consultas de cada um
 
-	int *consultas = (int *)malloc((ml - 1) * sizeof(int)); // declarando dinamicamente um array com o número de consultas de cada médico
+	consultaPorMed *c = (consultaPorMed *) malloc((ml - 1) * sizeof(consultaPorMed));
+	int *consultas = (int *) malloc((ml - 1) * sizeof(int));
 
-	for (i = 0; i < ml; i++) // Populando o array de quantidades de consultas médicas
-		*(consultas + i) = ConsultasMarcadas(medicos[i]);
-	for (i = 0; i < ml; i++) // Populando o array de quantidades de consultas médicas
-		printf("%d ", *(consultas + i));
-	printf("\n");
+	for (i = 0; i < ml; i++)
+	{
+		*(c + i) = ConstruirConslMed(medicos[i]);
+		*(consultas + i) = (c + i)->consultas;
+	}
 
+	qsort(consultas, ml - 1, sizeof(int), NULL);
+
+	for (i = 0; i < ml; i++)
+		printf("Consultas: %d\n", *(consultas + i));
+
+	free(c);
 	free(consultas);
 }
 
