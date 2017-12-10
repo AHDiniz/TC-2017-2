@@ -52,6 +52,16 @@ int main(int *argv, char *argc[])
 	LerDadosMedicos(dados, medicos, &nMed, conjunto);
 	LerDadosClientes(dados, clientes1, clientes2, clientes3, clientes4, &nCl1, &nCl2, &nCl3, &nCl4, conjunto);
 
+	printf("%d %d %ld %ld\n", strcmp(clientes1[0].medico, clientes1[2].medico), strcmp(medicos[0].nome, clientes1[2].medico), strlen(clientes1[0].medico), strlen(clientes1[2].medico));
+
+	RelacMedClientes(medicos, nMed, clientes1, nCl1);
+
+	for(i = 0 ; i < nMed ; i++)
+	{
+		ImprimirAgenda(medicos[i].agenda);
+		printf("\n");
+	}
+
 	TabelasMedicos(dados, medicos, clientes1, clientes2, clientes3, clientes4, nMed, nCl1, nCl2, nCl3, nCl4);
 
 	return 0;
@@ -92,7 +102,9 @@ void TabelasMedicos(FILE *dados, agMedico medicos[], cliente clientes1[], client
 	strcat(nomeMed, ".txt");
 
 	dados = fopen(nomeMed, "w");
-	fprintf(dados, "Medico: %s\nId: %d\nEspecialidade: %s\n\nQuadro de consultas semanais\n\n", medicos[0].nome, medicos[0].id, medicos[0].especialidade);
+	fprintf(dados, "Medico: %s", medicos[0].nome);
+	fprintf(dados, "\n\n");
+	fprintf(dados, "Id: %d\nEspecialidade: %s\n\nQuadro de consultas semanais\n\n", medicos[0].id, medicos[0].especialidade);
 
 
 	//RelacMedClientes(medicos, nMed, clientes1, nCl1);
@@ -109,8 +121,6 @@ void SemEspacos(char d[], char v[])
 	int i;
 
 	strcpy(d,v);
-
-	d[strlen(d)-1] = '\0';
 
 	for(i = 0 ; i < strlen(d) ; i++)
 		if(d[i] == ' ')
