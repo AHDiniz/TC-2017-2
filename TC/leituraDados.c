@@ -78,6 +78,9 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
         // Nome, id e especialidade:
         fscanf(dados, "%[^\n]\n%d\n%[^\n]\n", medicos[nMedc].nome, &medicos[nMedc].id, medicos[nMedc].especialidade);
 
+	medicos[nMedc].nome[strlen(medicos[nMedc].nome)-1] = '\0';
+	medicos[nMedc].especialidade[strlen(medicos[nMedc].especialidade)-1] = '\0';
+
         // Extraindo os horarios indisponiveis:
         // Preparando a recursão
         dia = 0;                                        // inicializa a variavel dia, so se altera caso a proxima linha escaneada comece com um numero, consegue advinhar qual?(dica: eh nome de uma variavel)
@@ -206,6 +209,9 @@ void LerClientes(FILE *dados, cliente clientes[], int *nCl)
     {
         fscanf(dados, "%[^\n]\n%d\n%lld\n%[^\n]\n%[^\n]\n", clientes[nClien].nome, &clientes[nClien].id, &clientes[nClien].fone, dataC, clientes[nClien].medico);
 
+	clientes[nClien].nome[strlen(clientes[nClien].nome)-1] = '\0';
+	clientes[nClien].medico[strlen(clientes[nClien].medico)-1] = '\0';
+
         SomenteInts(dataI, dataC);
 
         dataI[2] = dataI[2] * 100 + dataI[3];
@@ -219,4 +225,8 @@ void LerClientes(FILE *dados, cliente clientes[], int *nCl)
     *nCl = nClien;
 
     fclose(dados); // fechando o arquivo
+
+	// Impressao para teste
+	for(i = 0 ; i < nClien ; i++)
+		printf("%s\n%d\n%lld\n%d\n%s\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico);
 }
