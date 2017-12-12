@@ -40,7 +40,7 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
     int nMedc;   // numero total de medicos
 
     // Variáveis auxiliares para construção dos médicos:
-    int dia;                // armazena o dia(da semana) com horarios indisponiveis, atualizada numa recursao
+    int dia;                // armazena o dia(da semana) com horarios indisponiveis, atualizada num loop
     char indisponivel[DIM]; // armazena a string dos horarios indisponiveis (relativos ao dia)
     int horario[DIM];       // armazena os horarios indisponiveis ("filtra o vetor indisponiveis")
     int tam;                // armazena o tamanho do vetor horario
@@ -97,7 +97,7 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 		medicos[nMedc].especialidade[strlen(medicos[nMedc].especialidade)-1] = '\0';
 
         // Extraindo os horarios indisponiveis:
-        // Preparando a recursão
+        // Preparando o loop
         dia = 0;                                        // inicializa a variavel dia, so se altera caso a proxima linha escaneada comece com um numero, consegue advinhar qual?(dica: eh nome de uma variavel)
         fscanf(dados, "%d %[^\n]", &dia, indisponivel); // extrai os primeiros horarios indisponíveis e seus respectivos dias. Caso nao tenha, 'dia' se mantém igual a 0.
 
@@ -116,19 +116,10 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 
         nMedc++; // Atualizando o numero de medicos
 
-    } while (!feof(dados)); // a recursao continua até o fim do arquivo, retirando todos os dados de um unico medico a cada repeticao
-
-	Remove(medicos[0].nome,0);
-	Remove(medicos[0].nome,0);
-	Remove(medicos[0].nome,0);
+    } while (!feof(dados)); // o loop continua até o fim do arquivo, retirando todos os dados de um unico medico a cada repeticao
 
     *nMed = nMedc; // eu avisei
     fclose(dados); // fechando o arquivo
-/*
-	// Impressao para teste
-	for(i = 0 ; i < nMedc ; i++)
-		printf("%s\n%d\n%s\n\n", medicos[i].nome, medicos[i].id, medicos[i].especialidade);
-*/
 }
 
 void LerDadosClientes(FILE *dados, cliente clientes1[], cliente clientes2[], cliente clientes3[], cliente clientes4[], int *nCl1, int *nCl2, int *nCl3, int *nCl4, int conjunto)
@@ -259,16 +250,7 @@ void LerClientes(FILE *dados, cliente clientes[], int *nCl)
 
     } while (!feof(dados));
 
-	Remove(clientes[0].nome,0);
-	Remove(clientes[0].nome,0);
-	Remove(clientes[0].nome,0);
-
     *nCl = nClien;
 
     fclose(dados); // fechando o arquivo
-/*
-	// Impressao para teste
-	for(i = 0 ; i < nClien ; i++)
-		printf("%s\n%d\n%lld\n%d\n%s\n%d\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico, nClien);
-*/
 }
