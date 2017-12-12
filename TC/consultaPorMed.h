@@ -20,4 +20,6 @@ consultaPorMed ConstruirConslMed(agMedico);
 void QSortConsultaMed(agMedico *, int, int); // ordenação por seleção
 void BSortConsultaMed(agMedico *, int);      // ordenação por bolha
 
+int CompareConslMed(const void *, const void *); // Função de comparação
+
 #endif

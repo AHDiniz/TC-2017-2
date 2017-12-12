@@ -225,8 +225,4 @@ void LerClientes(FILE *dados, cliente clientes[], int *nCl)
     *nCl = nClien;
 
     fclose(dados); // fechando o arquivo
-
-	// Impressao para teste
-	for(i = 0 ; i < nClien ; i++)
-		printf("%s\n%d\n%lld\n%d\n%s\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico);
 }

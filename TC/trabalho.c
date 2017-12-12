@@ -36,6 +36,9 @@ void RankingMedico(agMedico *, int);					   // Função que faz um ranking dos m
 void EspecMaisRequisitada(agMedico *, int, int);		   // Função que verifica a especialidade com a maior quantidade de consultas marcadas
 void EspecPorFaixaEtaria(agMedico *, int, cliente *, int); // Função que verifica a especialidade mais procurada para cada faixa etária
 
+// Funções auxiliares:
+// int MaiorNumConsulMed(consultaPorMed *, int); // Função que retorna o maior número de consultas existente em um array de relações médico/número de consultas
+
 int main(int *argv, char *argc[])
 {
 	FILE *dados;
@@ -54,6 +57,12 @@ int main(int *argv, char *argc[])
 	LerDadosClientes(dados, clientes1, clientes2, clientes3, clientes4, &nCl1, &nCl2, &nCl3, &nCl4, conjunto);
 
 	RelacMedClientes(medicos, nMed, clientes1, nCl1);
+	RelacMedClientes(medicos, nMed, clientes2, nCl2);
+	RelacMedClientes(medicos, nMed, clientes3, nCl3);
+	RelacMedClientes(medicos, nMed, clientes4, nCl4);
+
+	RankingMedico(medicos, nMed);
+
 	return 0;
 }
 
@@ -86,22 +95,12 @@ void RankingMedico(agMedico medicos[], int ml)
 {
 	int i; // variável de incrementação
 
-	consultaPorMed *c = (consultaPorMed *) malloc((ml - 1) * sizeof(consultaPorMed));
-	int *consultas = (int *) malloc((ml - 1) * sizeof(int));
-
-	for (i = 0; i < ml; i++)
-	{
+	consultaPorMed *c = (consultaPorMed *) malloc((ml - 1) * sizeof(consultaPorMed)); // Criando dinamicamente um array de relações médico/número de consultas
+	
+	for (i = 0; i < ml; i++) // Populando o array criado
 		*(c + i) = ConstruirConslMed(medicos[i]);
-		*(consultas + i) = (c + i)->consultas;
-	}
 
-	qsort(consultas, ml - 1, sizeof(int), NULL);
-
-	for (i = 0; i < ml; i++)
-		printf("Consultas: %d\n", *(consultas + i));
-
-	free(c);
-	free(consultas);
+	qsort(c, ml - 1, sizeof(consultaPorMed), CompareConslMed); // Ordenando o array criado
 }
 
 void EspecMaisRequisitada(agMedico medicos[], int ml, int conjunto)

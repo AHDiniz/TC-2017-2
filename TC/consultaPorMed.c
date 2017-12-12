@@ -77,3 +77,13 @@ void BSortConsultaMed(agMedico medicos[], int ml)
 
     free(c);
 }
+
+int CompareConslMed(const void *a, const void *b)
+{
+    if (((consultaPorMed *)a)->consultas < ((consultaPorMed *)b)->consultas)
+        return -1;
+    else if (((consultaPorMed *)a)->consultas == ((consultaPorMed *)b)->consultas)
+        return 0;
+    else
+        return 1;
+}
