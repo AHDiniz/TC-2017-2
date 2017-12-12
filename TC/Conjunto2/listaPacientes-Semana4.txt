@@ -1,4 +1,4 @@
-﻿Leonidas de Termopilas
+Leonidas de Termopilas
 300
 27939657845
 30 10 1950
@@ -9,3 +9,4 @@ Benito Amilcare Mussolini
 27965987989
 31 10 1922
 Adolf Hitler
+

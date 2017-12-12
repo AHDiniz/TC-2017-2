@@ -1,4 +1,4 @@
-﻿Red Ranger
+Red Ranger
 001
 27988679443
 28 08 1993
@@ -27,3 +27,4 @@ Pink Ranger
 27929657100
 06 02 1999
 The Batman
+
