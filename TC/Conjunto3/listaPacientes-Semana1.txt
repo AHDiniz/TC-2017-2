@@ -5,7 +5,7 @@
 J. R. R. Tolkien
 
 Bruce Wayne
-000
+100
 27955555555
 27 05 1939
 The Batman
@@ -15,3 +15,4 @@ Doom Guy
 27996574356
 10 12 1993
 Shigeru Miyamoto
+

@@ -2,7 +2,7 @@
 
 #define CONSULTA_POR_ESPEC_H
 
-#define DIM 30 // tamanho máximo de uma string
+#define DIM 50 // tamanho máximo de uma string
 #define H 10   // quantidade de intervalos de uma hora durante o dia (linhas da matriz de agenda de um médico)
 #define D 5    // dias úteis da semana (colunas da matriz de agenda de um médico)
 #define ML 5   // limite de médicos em um array / um mesmo arquivo

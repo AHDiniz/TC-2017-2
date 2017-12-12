@@ -2,7 +2,7 @@
 
 #define CLIENTE_H
 
-#define DIM 30
+#define DIM 50
 
 // Definição das características relevantes de um cliente:
 typedef struct cliente

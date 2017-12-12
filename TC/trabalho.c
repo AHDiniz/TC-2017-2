@@ -20,7 +20,7 @@ Grupo: Alan Herculano Diniz e Rafael Belmock Pedruzzi
 #include "cliente.h"
 #include "leituraDados.h"
 
-#define DIM 30 // tamanho máximo de uma string
+#define DIM 50 // tamanho máximo de uma string
 #define H   10 // quantidade de intervalos de uma hora durante o dia (linhas da matriz de agenda de um médico)
 #define D    5 // dias úteis da semana (colunas da matriz de agenda de um médico)
 #define ML   5 // limite de médicos em um array / um mesmo arquivo
@@ -31,9 +31,11 @@ void RelacMedClientes(agMedico *, int, cliente *, int); // Função que compara 
 void MarcarConsulta(agMedico *, cliente);				// Função que marca uma consulta entre médico e cliente
 
 // Funções relacinadas com os relatórios:
-void TabelasMedicos(FILE *dados, agMedico *, cliente *, cliente *, cliente *, cliente *, int, int, int, int, int);
+void TabelasMedicos(FILE *, agMedico *, cliente *, cliente *, cliente *, cliente *, int, int, int, int, int);
+void ImprimeTabela(FILE *, agMedico *, int, int);
+
+// Auxiliares de TabelasMedicos:
 void SemEspacos(char *, char *);
-void Remove(char *, int);
 
 int main(int *argv, char *argc[])
 {
@@ -52,18 +54,14 @@ int main(int *argv, char *argc[])
 	LerDadosMedicos(dados, medicos, &nMed, conjunto);
 	LerDadosClientes(dados, clientes1, clientes2, clientes3, clientes4, &nCl1, &nCl2, &nCl3, &nCl4, conjunto);
 
-	printf("%d %d %ld %ld\n", strcmp(clientes1[0].medico, clientes1[2].medico), strcmp(medicos[0].nome, clientes1[2].medico), strlen(clientes1[0].medico), strlen(clientes1[2].medico));
-
-	RelacMedClientes(medicos, nMed, clientes1, nCl1);
-
+	TabelasMedicos(dados, medicos, clientes1, clientes2, clientes3, clientes4, nMed, nCl1, nCl2, nCl3, nCl4);
+/*
 	for(i = 0 ; i < nMed ; i++)
 	{
 		ImprimirAgenda(medicos[i].agenda);
 		printf("\n");
 	}
-
-	TabelasMedicos(dados, medicos, clientes1, clientes2, clientes3, clientes4, nMed, nCl1, nCl2, nCl3, nCl4);
-
+*/
 	return 0;
 }
 
@@ -75,6 +73,7 @@ void RelacMedClientes(agMedico medicos[], int ml, cliente clientes[], int cl)
 		for (j = 0; j < ml; j++) // Procurar no array de médicos um que seja o mesmo que o cliente deseja
 			if (strcmp(clientes[i].medico, medicos[j].nome) == 0)
 				MarcarConsulta(&medicos[j], clientes[i]); // E então marcar uma consulta entre o médico e o cliente em questão
+
 }
 
 void MarcarConsulta(agMedico *m, cliente c)
@@ -95,24 +94,69 @@ void MarcarConsulta(agMedico *m, cliente c)
 void TabelasMedicos(FILE *dados, agMedico medicos[], cliente clientes1[], cliente clientes2[], cliente clientes3[], cliente clientes4[], int nMed, int nCl1, int nCl2, int nCl3, int nCl4)
 {
 
-	int i, j; // variáveis de incrementação
-	char nomeMed[DIM+4];
+	int i, med; // variáveis de incrementação
+	char nomeMed[nMed][DIM];
 
-	SemEspacos(nomeMed, medicos[0].nome);
-	strcat(nomeMed, ".txt");
+	for(i = 0 ; i < nMed ; i++)
+	{
+		strcpy(nomeMed[i],medicos[i].nome);
+		nomeMed[i][strlen(nomeMed[i])-1] = '.';
+		strcat(nomeMed[i], "txt");
+		SemEspacos(nomeMed[i], medicos[i].nome);
+	}
 
-	dados = fopen(nomeMed, "w");
-	fprintf(dados, "Medico: %s", medicos[0].nome);
-	fprintf(dados, "\n\n");
-	fprintf(dados, "Id: %d\nEspecialidade: %s\n\nQuadro de consultas semanais\n\n", medicos[0].id, medicos[0].especialidade);
+	//printf("%s\n", nomeMed[0]);
 
+	dados = fopen(nomeMed[0], "w");
+	fprintf(dados, "Medico: %s\nId: %d\nEspecialidade: %s\n\nQuadro de consultas semanais", medicos[0].nome, medicos[0].id, medicos[0].especialidade);
 
-	//RelacMedClientes(medicos, nMed, clientes1, nCl1);
+	RelacMedClientes(medicos, nMed, clientes1, nCl1);
 
-	
+	ImprimeTabela(dados, medicos, 0, 1);
+	//ResetAgenda(medicos[0].agenda);
 
 	fclose(dados);
-	
+
+}
+
+void ImprimeTabela(FILE *dados, agMedico medicos[], int m, int semana)
+{
+	int i, j = 0;
+
+	fprintf(dados, "\n\nSemana %d:\n\n        2a   3a   4a   5a   6a", semana);
+
+	do
+	{
+		switch(j)
+		{
+			case 0: fprintf(dados, "\n  8-9");
+				break;
+			case 1: fprintf(dados, "\n 9-10");
+				break;
+			case 2: fprintf(dados, "\n10-11");
+				break;
+			case 3: fprintf(dados, "\n11-12");
+				break;
+			case 4: fprintf(dados, "\n12-13");
+				break;
+			case 5: fprintf(dados, "\n13-14");
+				break;
+			case 6: fprintf(dados, "\n14-15");
+				break;
+			case 7: fprintf(dados, "\n15-16");
+				break;
+			case 8: fprintf(dados, "\n16-17");
+				break;
+			case 9: fprintf(dados, "\n17-18");
+				break;
+		}
+
+		for(i = 0 ; i < D ; i++)
+			fprintf(dados, "  %3d", medicos[m].agenda[j][i]);
+
+		j++;
+
+	}while(j < H);
 }
 
 void SemEspacos(char d[], char v[])
@@ -120,18 +164,7 @@ void SemEspacos(char d[], char v[])
 
 	int i;
 
-	strcpy(d,v);
-
 	for(i = 0 ; i < strlen(d) ; i++)
 		if(d[i] == ' ')
 			Remove(d, i);
-}
-
-void Remove(char d[], int n)
-{
-
-	int i;
-
-	for(i = n ; i < strlen(d) ; i++)
-		d[i] = d[i+1];
 }

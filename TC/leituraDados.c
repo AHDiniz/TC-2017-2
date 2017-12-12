@@ -25,6 +25,15 @@ int SomenteInts(int horario[], char indisponivel[])
     return tam; // o tamanho real do vetor, somente a parte dos numeros reagrupados
 }
 
+void Remove(char d[], int n)
+{
+
+	int i;
+
+	for(i = n ; i < strlen(d) ; i++)
+		d[i] = d[i+1];
+}
+
 void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 {
     int i, j, k; // variáveis de incrementação
@@ -35,6 +44,7 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
     char indisponivel[DIM]; // armazena a string dos horarios indisponiveis (relativos ao dia)
     int horario[DIM];       // armazena os horarios indisponiveis ("filtra o vetor indisponiveis")
     int tam;                // armazena o tamanho do vetor horario
+	char aux[DIM];
 
     // Inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido:
     switch (conjunto)
@@ -76,7 +86,15 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
         ConstroiAgenda(medicos[nMedc].agenda); // Inicializando a matriz agenda (vazia)
 
         // Nome, id e especialidade:
-        fscanf(dados, "%[^\n]\n%d\n%[^\n]\n", medicos[nMedc].nome, &medicos[nMedc].id, medicos[nMedc].especialidade);
+		fgets(medicos[nMedc].nome, DIM, dados);
+		medicos[nMedc].nome[strlen(medicos[nMedc].nome)-1] = '\0';
+
+		fgets(aux, DIM, dados);
+		aux[strlen(aux)-1] = '\0';
+		medicos[nMedc].id = atoi(aux);
+
+		fgets(medicos[nMedc].especialidade, DIM, dados);
+		medicos[nMedc].especialidade[strlen(medicos[nMedc].especialidade)-1] = '\0';
 
         // Extraindo os horarios indisponiveis:
         // Preparando a recursão
@@ -100,8 +118,17 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 
     } while (!feof(dados)); // a recursao continua até o fim do arquivo, retirando todos os dados de um unico medico a cada repeticao
 
+	Remove(medicos[0].nome,0);
+	Remove(medicos[0].nome,0);
+	Remove(medicos[0].nome,0);
+
     *nMed = nMedc; // eu avisei
     fclose(dados); // fechando o arquivo
+/*
+	// Impressao para teste
+	for(i = 0 ; i < nMedc ; i++)
+		printf("%s\n%d\n%s\n\n", medicos[i].nome, medicos[i].id, medicos[i].especialidade);
+*/
 }
 
 void LerDadosClientes(FILE *dados, cliente clientes1[], cliente clientes2[], cliente clientes3[], cliente clientes4[], int *nCl1, int *nCl2, int *nCl3, int *nCl4, int conjunto)
@@ -191,7 +218,7 @@ void LerClientes(FILE *dados, cliente clientes[], int *nCl)
     // Variáveis que auxiliaram na construção dos clientes:
     int dia, mes, ano, tam;
     int dataI[DIM];
-    char dataC[DIM];
+    char dataC[DIM], aux[DIM];
 
     // Verificando se não há erro:
     if (dados == NULL)
@@ -204,19 +231,44 @@ void LerClientes(FILE *dados, cliente clientes[], int *nCl)
     nClien = 0;
     do
     {
-        fscanf(dados, "%[^\n]\n%d\n%lld\n%[^\n]\n%[^\n]\n", clientes[nClien].nome, &clientes[nClien].id, &clientes[nClien].fone, dataC, clientes[nClien].medico);
+		fgets(clientes[nClien].nome, DIM, dados);
+		clientes[nClien].nome[strlen(clientes[nClien].nome)-1] = '\0';
+
+		fgets(aux, DIM, dados);
+		aux[strlen(aux)-1] = '\0';
+		clientes[nClien].id = atoi(aux);
+
+		fgets(aux, DIM, dados);
+		aux[strlen(aux)-1] = '\0';
+		clientes[nClien].fone = atoll(aux);
+
+		fgets(dataC, DIM, dados);
+
+		fgets(clientes[nClien].medico, DIM, dados);
+		clientes[nClien].medico[strlen(clientes[nClien].medico)-1] = '\0';
+
+		fscanf(dados, "\n");
 
         SomenteInts(dataI, dataC);
 
         dataI[2] = dataI[2] * 100 + dataI[3];
 
-        clientes[nClien].idade = 2017 - dataI[2];
+        clientes[nClien].idade = CalculoIdade(dataI);
 
         nClien++; // Atualizando o numero de clientes
 
     } while (!feof(dados));
 
+	Remove(clientes[0].nome,0);
+	Remove(clientes[0].nome,0);
+	Remove(clientes[0].nome,0);
+
     *nCl = nClien;
 
     fclose(dados); // fechando o arquivo
+/*
+	// Impressao para teste
+	for(i = 0 ; i < nClien ; i++)
+		printf("%s\n%d\n%lld\n%d\n%s\n%d\n\n", clientes[i].nome, clientes[i].id, clientes[i].fone, clientes[i].idade, clientes[i].medico, nClien);
+*/
 }
