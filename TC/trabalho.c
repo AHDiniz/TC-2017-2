@@ -54,14 +54,14 @@ int main(int *argv, char *argc[])
 	LerDadosMedicos(dados, medicos, &nMed, conjunto);
 	LerDadosClientes(dados, clientes1, clientes2, clientes3, clientes4, &nCl1, &nCl2, &nCl3, &nCl4, conjunto);
 
-	TabelasMedicos(dados, medicos, clientes1, clientes2, clientes3, clientes4, nMed, nCl1, nCl2, nCl3, nCl4);
-/*
+	//TabelasMedicos(dados, medicos, clientes1, clientes2, clientes3, clientes4, nMed, nCl1, nCl2, nCl3, nCl4);
+
 	for(i = 0 ; i < nMed ; i++)
 	{
 		ImprimirAgenda(medicos[i].agenda);
 		printf("\n");
 	}
-*/
+
 	return 0;
 }
 
