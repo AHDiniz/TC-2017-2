@@ -25,16 +25,26 @@ int SomenteInts(int horario[], char indisponivel[])
     return tam; // o tamanho real do vetor, somente a parte dos numeros reagrupados
 }
 
+void Remove(char d[], int n)
+{
+
+	int i;
+
+	for(i = n ; i < strlen(d) ; i++)
+		d[i] = d[i+1];
+}
+
 void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 {
     int i, j, k; // variáveis de incrementação
     int nMedc;   // numero total de medicos
 
     // Variáveis auxiliares para construção dos médicos:
-    int dia;                // armazena o dia(da semana) com horarios indisponiveis, atualizada numa recursao
+    int dia;                // armazena o dia(da semana) com horarios indisponiveis, atualizada num loop
     char indisponivel[DIM]; // armazena a string dos horarios indisponiveis (relativos ao dia)
     int horario[DIM];       // armazena os horarios indisponiveis ("filtra o vetor indisponiveis")
     int tam;                // armazena o tamanho do vetor horario
+	char aux[DIM];
 
     // Inicializando o ponteiro do arquivo desejado, fazendo que esse seja somente lido:
     switch (conjunto)
@@ -76,13 +86,18 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
         ConstroiAgenda(medicos[nMedc].agenda); // Inicializando a matriz agenda (vazia)
 
         // Nome, id e especialidade:
-        fscanf(dados, "%[^\n]\n%d\n%[^\n]\n", medicos[nMedc].nome, &medicos[nMedc].id, medicos[nMedc].especialidade);
+		fgets(medicos[nMedc].nome, DIM, dados);
+		medicos[nMedc].nome[strlen(medicos[nMedc].nome)-1] = '\0';
 
-	medicos[nMedc].nome[strlen(medicos[nMedc].nome)-1] = '\0';
-	medicos[nMedc].especialidade[strlen(medicos[nMedc].especialidade)-1] = '\0';
+		fgets(aux, DIM, dados);
+		aux[strlen(aux)-1] = '\0';
+		medicos[nMedc].id = atoi(aux);
+
+		fgets(medicos[nMedc].especialidade, DIM, dados);
+		medicos[nMedc].especialidade[strlen(medicos[nMedc].especialidade)-1] = '\0';
 
         // Extraindo os horarios indisponiveis:
-        // Preparando a recursão
+        // Preparando o loop
         dia = 0;                                        // inicializa a variavel dia, so se altera caso a proxima linha escaneada comece com um numero, consegue advinhar qual?(dica: eh nome de uma variavel)
         fscanf(dados, "%d %[^\n]", &dia, indisponivel); // extrai os primeiros horarios indisponíveis e seus respectivos dias. Caso nao tenha, 'dia' se mantém igual a 0.
 
@@ -101,7 +116,7 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
 
         nMedc++; // Atualizando o numero de medicos
 
-    } while (!feof(dados)); // a recursao continua até o fim do arquivo, retirando todos os dados de um unico medico a cada repeticao
+    } while (!feof(dados)); // o loop continua até o fim do arquivo, retirando todos os dados de um unico medico a cada repeticao
 
     *nMed = nMedc; // eu avisei
     fclose(dados); // fechando o arquivo
@@ -194,7 +209,7 @@ void LerClientes(FILE *dados, cliente clientes[], int *nCl)
     // Variáveis que auxiliaram na construção dos clientes:
     int dia, mes, ano, tam;
     int dataI[DIM];
-    char dataC[DIM];
+    char dataC[DIM], aux[DIM];
 
     // Verificando se não há erro:
     if (dados == NULL)
@@ -207,16 +222,29 @@ void LerClientes(FILE *dados, cliente clientes[], int *nCl)
     nClien = 0;
     do
     {
-        fscanf(dados, "%[^\n]\n%d\n%lld\n%[^\n]\n%[^\n]\n", clientes[nClien].nome, &clientes[nClien].id, &clientes[nClien].fone, dataC, clientes[nClien].medico);
+		fgets(clientes[nClien].nome, DIM, dados);
+		clientes[nClien].nome[strlen(clientes[nClien].nome)-1] = '\0';
 
-	clientes[nClien].nome[strlen(clientes[nClien].nome)-1] = '\0';
-	clientes[nClien].medico[strlen(clientes[nClien].medico)-1] = '\0';
+		fgets(aux, DIM, dados);
+		aux[strlen(aux)-1] = '\0';
+		clientes[nClien].id = atoi(aux);
+
+		fgets(aux, DIM, dados);
+		aux[strlen(aux)-1] = '\0';
+		clientes[nClien].fone = atoll(aux);
+
+		fgets(dataC, DIM, dados);
+
+		fgets(clientes[nClien].medico, DIM, dados);
+		clientes[nClien].medico[strlen(clientes[nClien].medico)-1] = '\0';
+
+		fscanf(dados, "\n");
 
         SomenteInts(dataI, dataC);
 
         dataI[2] = dataI[2] * 100 + dataI[3];
 
-        clientes[nClien].idade = 2017 - dataI[2];
+        clientes[nClien].idade = CalculoIdade(dataI);
 
         nClien++; // Atualizando o numero de clientes
 
