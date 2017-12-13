@@ -16,7 +16,7 @@ void QSortConsultaMed(agMedico medicos[], int inicio, int fim)
     int pivot; // ponto de referência para a seleção
     consultaPorMed aux;
     
-    consultaPorMed *c = (consultaPorMed *) malloc((fim - inicio) * sizeof(consultaPorMed)); // Declarando dinamicamente um array de relações médico / número de consultas
+    consultaPorMed c[10]; // Declarando dinamicamente um array de relações médico / número de consultas
 
     if (inicio < fim) // Condição de parada do quick sort
     {
@@ -58,7 +58,7 @@ void BSortConsultaMed(agMedico medicos[], int ml)
 {
     int i, j; // variáveis de incrementação
     consultaPorMed aux;
-    consultaPorMed *c = (consultaPorMed *) malloc((ml - 1) * sizeof(consultaPorMed));
+    consultaPorMed c[10];
     
     for (i = 0; i < ml; i++)
         *(c + i) = ConstruirConslMed(medicos[i]);
