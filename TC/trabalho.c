@@ -55,7 +55,7 @@ int main(int *argv, char *argc[])
 	cliente clientes3[CL];			  // vetor de clientes da semana 3
 	cliente clientes4[CL];			  // vetor de clientes da semana 4
 	relacMC lista[DIM];
-	int nRel;
+	int nRel = 0;
 
 	printf("Informe o numero do conjunto a ser avaliado (0 - 5): ");
 	scanf("%d", &conjunto);
@@ -65,18 +65,15 @@ int main(int *argv, char *argc[])
 
 	TabelasMedicos(dados, medicos, clientes1, clientes2, clientes3, clientes4, nMed, nCl1, nCl2, nCl3, nCl4, lista, &nRel);
 
-	for(i = 0 ; i < nMed ; i++)
-	{
-		ImprimirAgenda(medicos[i].agenda);
-		printf("\n");
-	}
+	for(i = 0 ; i < nRel ; i++)
+		printf("%s\n%s\n%d\n\n", lista[i].medico, lista[i].especialidade, lista[i].idade);
 
 	return 0;
 }
 
 void RelacMedClientes(agMedico medicos[], int ml, cliente clientes[], int cl, relacMC lista[], int *nRel)
 {
-	int i, j, nc = 0; // variáveis de incrementação
+	int i, j, nc = *nRel; // variáveis de incrementação
 	// Para cada cliente no array de clientes:
 	for (i = 0; i < cl; i++)
 		for (j = 0; j < ml; j++) // Procurar no array de médicos um que seja o mesmo que o cliente deseja
@@ -88,8 +85,8 @@ void RelacMedClientes(agMedico medicos[], int ml, cliente clientes[], int cl, re
 				lista[nc].idade = clientes[i].idade;
 				nc++;
 			}
-
-	*nRel = nc;
+	nc -= *nRel;
+	*nRel += nc;
 }
 
 void MarcarConsulta(agMedico *m, cliente c)
