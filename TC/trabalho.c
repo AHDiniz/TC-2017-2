@@ -26,12 +26,19 @@ Grupo: Alan Herculano Diniz e Rafael Belmock Pedruzzi
 #define ML   5 // limite de médicos em um array / um mesmo arquivo
 #define CL  45 // limite de pacientes em um array / um mesmo arquivo
 
+typedef struct relacMC
+{
+    char medico[DIM];
+    char especialidade[DIM];
+    int idade;
+} relacMC;
+
 // Funções que relacionam médicos e clientes:
-void RelacMedClientes(agMedico *, int, cliente *, int); // Função que compara um array de médicos com um array de clientes para que a marcação de consultas seja feita de forma correta
+void RelacMedClientes(agMedico *, int, cliente *, int, relacMC *, int *); // Função que compara um array de médicos com um array de clientes para que a marcação de consultas seja feita de forma correta
 void MarcarConsulta(agMedico *, cliente);				// Função que marca uma consulta entre médico e cliente
 
 // Funções relacinadas com os relatórios:
-void TabelasMedicos(FILE *, agMedico *, cliente *, cliente *, cliente *, cliente *, int, int, int, int, int);
+void TabelasMedicos(FILE *, agMedico *, cliente *, cliente *, cliente *, cliente *, int, int, int, int, int, relacMC *, int *);
 void ImprimeTabela(FILE *, agMedico *, int, int);
 
 // Auxiliares de TabelasMedicos:
@@ -47,6 +54,8 @@ int main(int *argv, char *argc[])
 	cliente clientes2[CL];			  // vetor de clientes da semana 2
 	cliente clientes3[CL];			  // vetor de clientes da semana 3
 	cliente clientes4[CL];			  // vetor de clientes da semana 4
+	relacMC lista[DIM];
+	int nRel;
 
 	printf("Informe o numero do conjunto a ser avaliado (0 - 5): ");
 	scanf("%d", &conjunto);
@@ -54,7 +63,7 @@ int main(int *argv, char *argc[])
 	LerDadosMedicos(dados, medicos, &nMed, conjunto);
 	LerDadosClientes(dados, clientes1, clientes2, clientes3, clientes4, &nCl1, &nCl2, &nCl3, &nCl4, conjunto);
 
-	//TabelasMedicos(dados, medicos, clientes1, clientes2, clientes3, clientes4, nMed, nCl1, nCl2, nCl3, nCl4);
+	TabelasMedicos(dados, medicos, clientes1, clientes2, clientes3, clientes4, nMed, nCl1, nCl2, nCl3, nCl4, lista, &nRel);
 
 	for(i = 0 ; i < nMed ; i++)
 	{
@@ -65,15 +74,22 @@ int main(int *argv, char *argc[])
 	return 0;
 }
 
-void RelacMedClientes(agMedico medicos[], int ml, cliente clientes[], int cl)
+void RelacMedClientes(agMedico medicos[], int ml, cliente clientes[], int cl, relacMC lista[], int *nRel)
 {
-	int i, j; // variáveis de incrementação
+	int i, j, nc = 0; // variáveis de incrementação
 	// Para cada cliente no array de clientes:
 	for (i = 0; i < cl; i++)
 		for (j = 0; j < ml; j++) // Procurar no array de médicos um que seja o mesmo que o cliente deseja
 			if (strcmp(clientes[i].medico, medicos[j].nome) == 0)
+			{
 				MarcarConsulta(&medicos[j], clientes[i]); // E então marcar uma consulta entre o médico e o cliente em questão
+				strcpy(lista[nc].medico,medicos[j].nome);
+				strcpy(lista[nc].especialidade,medicos[j].especialidade);
+				lista[nc].idade = clientes[i].idade;
+				nc++;
+			}
 
+	*nRel = nc;
 }
 
 void MarcarConsulta(agMedico *m, cliente c)
@@ -91,10 +107,10 @@ void MarcarConsulta(agMedico *m, cliente c)
 			}
 }
 
-void TabelasMedicos(FILE *dados, agMedico medicos[], cliente clientes1[], cliente clientes2[], cliente clientes3[], cliente clientes4[], int nMed, int nCl1, int nCl2, int nCl3, int nCl4)
+void TabelasMedicos(FILE *dados, agMedico medicos[], cliente clientes1[], cliente clientes2[], cliente clientes3[], cliente clientes4[], int nMed, int nCl1, int nCl2, int nCl3, int nCl4, relacMC lista[], int *nRel)
 {
 
-	int i, med; // variáveis de incrementação
+	int i; // variáveis de incrementação
 	char nomeMed[nMed][DIM];
 
 	for(i = 0 ; i < nMed ; i++)
@@ -107,16 +123,48 @@ void TabelasMedicos(FILE *dados, agMedico medicos[], cliente clientes1[], client
 
 	//printf("%s\n", nomeMed[0]);
 
-	dados = fopen(nomeMed[0], "w");
-	fprintf(dados, "Medico: %s\nId: %d\nEspecialidade: %s\n\nQuadro de consultas semanais", medicos[0].nome, medicos[0].id, medicos[0].especialidade);
+	for(i = 0 ; i < nMed ; i++)
+	{
+		dados = fopen(nomeMed[i], "w");
+		fprintf(dados, "Medico: %s\nId: %d\nEspecialidade: %s\n\nQuadro de consultas semanais", medicos[i].nome, medicos[i].id, medicos[i].especialidade);
+		fclose(dados);
+	}
 
-	RelacMedClientes(medicos, nMed, clientes1, nCl1);
+	RelacMedClientes(medicos, nMed, clientes1, nCl1, lista, nRel);
+	for(i = 0 ; i < nMed ; i++)
+	{
+		dados = fopen(nomeMed[i], "a");
+		ImprimeTabela(dados, medicos, i, 1);
+		fclose(dados);
+		ResetAgenda(medicos[i].agenda);
+	}
 
-	ImprimeTabela(dados, medicos, 0, 1);
-	//ResetAgenda(medicos[0].agenda);
+	RelacMedClientes(medicos, nMed, clientes2, nCl2, lista, nRel);
+	for(i = 0 ; i < nMed ; i++)
+	{
+		dados = fopen(nomeMed[i], "a");
+		ImprimeTabela(dados, medicos, i, 2);
+		fclose(dados);
+		ResetAgenda(medicos[i].agenda);
+	}
 
-	fclose(dados);
+	RelacMedClientes(medicos, nMed, clientes3, nCl3, lista, nRel);
+	for(i = 0 ; i < nMed ; i++)
+	{
+		dados = fopen(nomeMed[i], "a");
+		ImprimeTabela(dados, medicos, i, 3);
+		fclose(dados);
+		ResetAgenda(medicos[i].agenda);
+	}
 
+	RelacMedClientes(medicos, nMed, clientes4, nCl4, lista, nRel);
+	for(i = 0 ; i < nMed ; i++)
+	{
+		dados = fopen(nomeMed[i], "a");
+		ImprimeTabela(dados, medicos, i, 4);
+		fclose(dados);
+		ResetAgenda(medicos[i].agenda);
+	}
 }
 
 void ImprimeTabela(FILE *dados, agMedico medicos[], int m, int semana)
