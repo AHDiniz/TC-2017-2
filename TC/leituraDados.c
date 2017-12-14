@@ -137,7 +137,7 @@ void LerDadosClientes(FILE *dados, cliente clientes1[], cliente clientes2[], cli
             LerClientes(dados, clientes3, nCl3);
             dados = fopen("Conjunto0/listaPacientes-Semana4.txt", "r");
             LerClientes(dados, clientes4, nCl4);
-            fclose(dados);
+            //fclose(dados);
             break;
         case 1:
             dados = fopen("Conjunto1/listaPacientes-Semana1.txt", "r");
@@ -148,7 +148,7 @@ void LerDadosClientes(FILE *dados, cliente clientes1[], cliente clientes2[], cli
             LerClientes(dados, clientes3, nCl3);
             dados = fopen("Conjunto1/listaPacientes-Semana4.txt", "r");
             LerClientes(dados, clientes4, nCl4);
-            fclose(dados);
+            //fclose(dados);
             break;
         case 2:
             dados = fopen("Conjunto2/listaPacientes-Semana1.txt", "r");
@@ -159,7 +159,7 @@ void LerDadosClientes(FILE *dados, cliente clientes1[], cliente clientes2[], cli
             LerClientes(dados, clientes3, nCl3);
             dados = fopen("Conjunto2/listaPacientes-Semana4.txt", "r");
             LerClientes(dados, clientes4, nCl4);
-            fclose(dados);
+            //fclose(dados);
             break;
         case 3:
             dados = fopen("Conjunto3/listaPacientes-Semana1.txt", "r");
@@ -170,7 +170,7 @@ void LerDadosClientes(FILE *dados, cliente clientes1[], cliente clientes2[], cli
             LerClientes(dados, clientes3, nCl3);
             dados = fopen("Conjunto3/listaPacientes-Semana4.txt", "r");
             LerClientes(dados, clientes4, nCl4);
-            fclose(dados);
+            //fclose(dados);
             break;
         case 4:
             dados = fopen("Conjunto4/listaPacientes-Semana1.txt", "r");
@@ -181,7 +181,7 @@ void LerDadosClientes(FILE *dados, cliente clientes1[], cliente clientes2[], cli
             LerClientes(dados, clientes3, nCl3);
             dados = fopen("Conjunto4/listaPacientes-Semana4.txt", "r");
             LerClientes(dados, clientes4, nCl4);
-            fclose(dados);
+            //fclose(dados);
             break;
         case 5:
             dados = fopen("Conjunto5/listaPacientes-Semana1.txt", "r");
@@ -192,7 +192,7 @@ void LerDadosClientes(FILE *dados, cliente clientes1[], cliente clientes2[], cli
             LerClientes(dados, clientes3, nCl3);
             dados = fopen("Conjunto5/listaPacientes-Semana4.txt", "r");
             LerClientes(dados, clientes4, nCl4);
-            fclose(dados);
+            //fclose(dados);
             break;
         default:
             printf("Conjunto nao existe!\n");
