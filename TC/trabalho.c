@@ -39,13 +39,20 @@ void MarcarConsulta(agMedico *, cliente);				// Função que marca uma consulta 
 
 // Funções relacinadas com os relatórios:
 void TabelasMedicos(FILE *, agMedico *, cliente *, cliente *, cliente *, cliente *, int, int, int, int, int, relacMC *, int *);
-void MedicoMaisPopular(FILE *, agMedico medicos[], int nMed, relacMC *, int);
+void MedicoMaisPopular(FILE *, agMedico *, int, relacMC *, int);
+void RankEspec(FILE *, agMedico *, int, relacMC *, int, char (*)[DIM], int *);
+void EspecFaixa(FILE *, relacMC *, int, char (*)[DIM], int);
 
 // Auxiliares de TabelasMedicos:
 void SemEspacos(char *, char *);
 void ImprimeTabela(FILE *, agMedico *, int, int);
 
-// Auxiliares de MedicoMaisPopular:
+// Auxiliares de dadosClinica.txt:
+void SemRepetidos(int *, int *);
+void RemoveInt(int *, int *, int);
+void ImprimeFaixa(FILE *, relacMC *, int, char (*)[DIM], int, int *, int *, int, int);
+void InicCA(int *, int *);
+int cmpfunc (const void *, const void *);
 
 int main(int *argv, char *argc[])
 {
@@ -59,6 +66,8 @@ int main(int *argv, char *argc[])
 	cliente clientes4[CL];			  // vetor de clientes da semana 4
 	relacMC lista[DIM];				  // vetor das consultas marcadas
 	int nRel = 0;					  // numero de consultas marcadas
+	char especs[ML][DIM]; 			  // vetor com as especialidades
+	int nEsp = 1;		  			  // numero de especialidades
 
 	printf("Informe o numero do conjunto a ser avaliado (0 - 5): ");
 	scanf("%d", &conjunto);
@@ -69,9 +78,8 @@ int main(int *argv, char *argc[])
 	TabelasMedicos(dados, medicos, clientes1, clientes2, clientes3, clientes4, nMed, nCl1, nCl2, nCl3, nCl4, lista, &nRel);
 
 	MedicoMaisPopular(dados, medicos, nMed, lista, nRel);
-
-	for(i = 0 ; i < nRel ; i++)
-		printf("%s\n%s\n%d\n\n", lista[i].medico, lista[i].especialidade, lista[i].idade);
+	RankEspec(dados, medicos, nMed, lista, nRel, especs, &nEsp);
+	EspecFaixa(dados, lista, nRel, especs, nEsp);
 
 	return 0;
 }
@@ -226,15 +234,168 @@ void SemEspacos(char d[], char v[]) // remove espaços! \o/
 void MedicoMaisPopular(FILE *dados, agMedico medicos[], int nMed, relacMC lista[], int nRel)
 {
 	int i, j;		 // variaveis de incrementaçao
-	int popular;	 // numero de consultas do(s) medico(s) mais popular(es)
+	//int popular;	 // numero de consultas do(s) medico(s) mais popular(es)
 	int numCon[ML];  // vetor dos numeros de consultas
+	int numAux[ML];  // vetorque sera ordenado para obtenção do maior numero
 
-	for(i = 0 ; i < ML ; i++) // inicializando o numero de consultas
-		numCon[i] = 0;
+	InicCA(numCon, numAux);
 
 	for(i = 0 ; i < nMed ; i++) 							 // para cada medico
-		for(i = 0 ; i < nRel ; i++)							 // para cada consulta
+		for(j = 0 ; j < nRel ; j++)							 // para cada consulta
 			if(strcmp(medicos[i].nome,lista[j].medico) == 0) // verifica se o medico foi consultado
+			{
 				numCon[i]++;								 // incrementa o numero de consultas do medico (definido pela posiçao)
+				numAux[i]++;
+			}
 
+	qsort(numAux, nMed, sizeof(int), cmpfunc); // ordena o vetor auxiliar, numConsultas nao eh ordenado para conservar as posicoes
+
+	dados = fopen("dadosClinica.txt", "w"); // inicializando o arquivo
+	fprintf(dados, "-Médico(s) mais popular(es):\n\n");
+
+	for(i = 0 ; i < nMed ; i++)						 // para cada medico
+		if(numCon[i] == numAux[nMed-1])				 // se tiver numero de consultas igual ao maior do vetor ordenado
+			fprintf(dados, "%s\n", medicos[i].nome); // o nome do medico sera inserido no arquivo
+
+	fclose(dados);
+}
+
+void RankEspec(FILE *dados, agMedico medicos[], int nMed, relacMC lista[], int nRel, char especs[][DIM], int *nEsp)
+{
+	int i, j, k = 1; 	  // variaveis de incrementaçao
+	int numCon[ML];		  // vetor com o numero de consultas de cada especialidade
+	int numAux[ML];  	  // vetorque sera ordenado para obtenção do maior numero
+	int nAux, nE = *nEsp;
+
+	InicCA(numCon, numAux);
+
+	strcpy(especs[0],medicos[0].especialidade);
+
+	for(i = 1 ; i < nMed ; i++)
+	{
+		for(j = 0 ; j < i ; j++)
+			if(strcmp(medicos[i].especialidade,medicos[j].especialidade) == 0)
+				k = 0;
+		if(k == 1)
+		{
+			strcpy(especs[nE],medicos[i].especialidade);
+			nE++;
+		}
+		k = 1;
+	}
+
+	for(i = 0 ; i < nE ; i++) 							  // para cada especialidade
+		for(j = 0 ; j < nRel ; j++)							  // para cada consulta
+			if(strcmp(especs[i],lista[j].especialidade) == 0) // verifica se a especialidade foi consultada
+			{
+				numCon[i]++;								  // incrementa o numero de consultas da especialidade (definido pela posiçao)
+				numAux[i]++;
+			}
+
+	nAux = nE;
+	SemRepetidos(numAux, &nAux);
+	qsort(numAux, nAux, sizeof(int), cmpfunc); // ordena o vetor auxiliar, numConsultas nao eh ordenado para conservar as posicoes
+
+	dados = fopen("dadosClinica.txt", "a"); // inicializando o arquivo
+	fprintf(dados, "\n\n-Ranking de procura por especialidades médicas:");
+
+	for(j = nAux-1 ; j >= 0 ; j--)
+		for(i = 0 ; i < nE ; i++)
+			if(numCon[i] == numAux[j])
+				fprintf(dados, "\n\n%s\n%d pacientes atendidos", especs[i], numCon[i]);
+
+	fclose(dados);
+
+	*nEsp = nE;
+}
+
+void EspecFaixa(FILE *dados, relacMC lista[], int nRel, char especs[][DIM], int nEsp)
+{
+	int i, j;
+	int numCon[ML];		  // vetor com o numero de consultas de cada especialidade
+	int numAux[ML];  	  // vetorque sera ordenado para obtenção do maior numero
+
+	dados = fopen("dadosClinica.txt", "a"); // inicializando o arquivo
+	fprintf(dados, "\n\n-Especialidade mais procurada por faixa etária:");
+
+	ImprimeFaixa(dados, lista, nRel, especs, nEsp, numCon, numAux, 0, 25);
+	ImprimeFaixa(dados, lista, nRel, especs, nEsp, numCon, numAux, 26, 50);
+	ImprimeFaixa(dados, lista, nRel, especs, nEsp, numCon, numAux, 51, 75);
+	ImprimeFaixa(dados, lista, nRel, especs, nEsp, numCon, numAux, 75, 100);
+
+	fclose(dados);
+}
+
+void ImprimeFaixa(FILE *dados, relacMC lista[], int nRel, char especs[][DIM], int nEsp, int numCon[], int numAux[], int l1, int l2)
+{
+	int i, j;
+	int nAux = nEsp;
+
+	InicCA(numCon, numAux);
+
+	for(i = 0 ; i < nEsp ; i++)
+		for(j = 0 ; j < nRel ; j++)
+			if(lista[j].idade >= l1 && lista[j].idade <= l2 && strcmp(especs[i],lista[j].especialidade) == 0)
+			{
+				numCon[i]++;								  // incrementa o numero de consultas da especialidade (definido pela posiçao)
+				numAux[i]++;
+			}
+
+	SemRepetidos(numAux, &nAux);
+	qsort(numAux, nAux, sizeof(int), cmpfunc); // ordena o vetor auxiliar, numConsultas nao eh ordenado para conservar as posicoes
+
+	fprintf(dados, "\n\n%d - %d:", l1, l2);
+
+	if(numAux[nAux-1] == 0)
+		fprintf(dados, "\n--");
+	else
+		for(i = 0 ; i < nEsp ; i++)					 // para cada especialidade
+			if(numCon[i] == numAux[nAux-1])	 		 // se tiver numero de consultas igual ao maior do vetor ordenado
+				fprintf(dados, "\n%s", especs[i]); // o nome da especialidade sera inserido no arquivo
+}
+
+void InicCA(int numCon[], int numAux[])
+{
+	int i;
+
+	for(i = 0 ; i < ML ; i++) // inicializando o numero de consultas e auxiliar
+	{
+		numCon[i] = 0;
+		numAux[i] = 0;
+	}
+}
+
+void SemRepetidos(int v[], int *n)
+{
+	int i, j, k = 1, m;
+
+	m = *n;
+
+	for(i = m-1 ; i > 0 ; i--)
+	{
+		for(j = 0 ; j < i ; j++)
+			if(v[i] == v[j])
+				k = 0;
+		if(k == 0)
+			RemoveInt(v, n, i);
+		k = 1;
+	}
+
+}
+
+void RemoveInt(int v[], int *n, int p)
+{
+	int i, m;
+
+	m = *n;
+
+	for(i = p ; i < m-1 ; i++)
+		v[i] = v[i+1];
+
+	*n = m-1;
+}
+
+int cmpfunc (const void * a, const void * b)
+{
+   return ( *(int*)a - *(int*)b );
 }
