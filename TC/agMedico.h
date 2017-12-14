@@ -17,20 +17,11 @@ typedef struct agMedico
     int agenda[H][D];        // a matriz da agenda do médico
 } agMedico;
 
-// Funções para inicializar structs:
-agMedico ConstruirMedico(char *, int, int, char *, int, int (*)[D]); // Função que inicializa um médico
-
 // Funções auxiliares:
-int ConsultasMarcadas(agMedico); // Calcula a quantidade de consultas marcadas que um médico possui em sua agenda
-void ImprimirAgenda(int (*)[D]); // Função provisória que imprime cada elemento de uma agenda médica
-void AgendaRandom(int (*)[D]);   // Função que constrói uma agenda com elementos randômicos
 void ConstroiAgenda(int (*)[D]); // Função que constrói a agenda generica do medico
 void ResetAgenda(int (*)[D]);    // Função que reseta uma agenda médica
 
 // Funçõoes para ler dados específicos em arquivos texto:
 void ConstruirAgenda(int (*)[D], int, int *, int); // Função que cria uma matriz a paartir dos dados de uma agenda médica
-
-// Ordenação de arrays:
-void QSortConsulta(agMedico *, int, int); // Ordenação por seleção tomando como parâmetro a quantidade de consultas
 
 #endif
