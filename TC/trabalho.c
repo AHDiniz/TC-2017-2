@@ -69,7 +69,7 @@ int main(int *argv, char *argc[])
 	char especs[ML][DIM]; 			  // vetor com as especialidades
 	int nEsp = 1;		  			  // numero de especialidades
 
-	printf("Informe o numero do conjunto a ser avaliado (0 - 5): ");
+	printf("Informe o numero do conjunto a ser avaliado (1 - 5): ");
 	scanf("%d", &conjunto);
 
 	LerDadosMedicos(dados, medicos, &nMed, conjunto);
