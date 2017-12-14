@@ -1,29 +1,29 @@
 Red Ranger
-001
+100
 27988679443
 28 08 1993
 Shigeru Miyamoto
 
 Blue Ranger
-002
+200
 27998845732
 30 03 1996
 The Batman
 
 Green Ranger
-003
+300
 27903396875
 01 04 1997
 J. R. R. Tolkien
 
 Yellow Ranger
-004
+400
 27948657231
 23 05 1998
 Shigeru Miyamoto
 
 Pink Ranger
-005
+500
 27929657100
 06 02 1999
 The Batman
