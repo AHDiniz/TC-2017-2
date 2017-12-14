@@ -14,6 +14,4 @@ typedef struct cliente
     char medico[DIM];   // o médico pelo qual o cliente deseja ser atendido
 } cliente;
 
-cliente ConstruirCliente(char *, int, int, long int, int, char *, int); // Função que inicializa um cliente
-
 #endif
