@@ -109,7 +109,7 @@ void LerDadosMedicos(FILE *dados, agMedico medicos[], int *nMed, int conjunto)
             // Incluindo os horarios indisponiveis na agenda:
             ConstruirAgenda(medicos[nMedc].agenda, dia, horario, tam);
 
-            // Reinicializando as condicoes da recursao para extrair os proximos horarios:
+            // Reinicializando as condiçes do loop para extrair os proximos horarios:
             dia = 0;
             fscanf(dados, "%d %[^\n]", &dia, indisponivel); // extraindo proximo horario, caso seja a quebra de linha, 'dia' se mantem igual a 0
         }
